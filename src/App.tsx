@@ -10,7 +10,8 @@ interface WordToReplace {
   partOfSpeech: string;
   replacement?: string;
   index: number;
-  position: number; // Position in original text
+  startIndex: number; // Start position in original text
+  endIndex: number; // End position in original text
 }
 
 interface StoryData {
@@ -85,11 +86,9 @@ function App() {
 
   const analyzeTextForReplacements = (text: string): StoryData => {
     const doc = nlp(text);
-    const allWords = text.split(/\s+/);
-    const targetWordCount = Math.floor(allWords.length / 6); // 1 word per 6 words on average
     
-    // Get all potential words with their positions
-    const potentialWords: Array<{word: string, pos: string, position: number, textIndex: number}> = [];
+    // Get all potential words with their exact positions
+    const potentialWords: Array<{word: string, pos: string, startIndex: number, endIndex: number}> = [];
     
     // Extract nouns, verbs, and adjectives with their positions
     const nouns = doc.nouns().json();
@@ -98,65 +97,59 @@ function App() {
     
     // Add nouns
     nouns.forEach((noun: any) => {
-      const wordText = noun.text.toLowerCase();
-      const position = text.toLowerCase().indexOf(wordText);
-      if (position !== -1) {
+      if (noun.offset && noun.offset.start !== undefined && noun.offset.end !== undefined) {
         potentialWords.push({
           word: noun.text,
           pos: 'noun',
-          position: position,
-          textIndex: Math.floor(position / (text.length / allWords.length))
+          startIndex: noun.offset.start,
+          endIndex: noun.offset.end
         });
       }
     });
     
     // Add verbs
     verbs.forEach((verb: any) => {
-      const wordText = verb.text.toLowerCase();
-      const position = text.toLowerCase().indexOf(wordText);
-      if (position !== -1) {
+      if (verb.offset && verb.offset.start !== undefined && verb.offset.end !== undefined) {
         potentialWords.push({
           word: verb.text,
           pos: 'verb',
-          position: position,
-          textIndex: Math.floor(position / (text.length / allWords.length))
+          startIndex: verb.offset.start,
+          endIndex: verb.offset.end
         });
       }
     });
     
     // Add adjectives
     adjectives.forEach((adj: any) => {
-      const wordText = adj.text.toLowerCase();
-      const position = text.toLowerCase().indexOf(wordText);
-      if (position !== -1) {
+      if (adj.offset && adj.offset.start !== undefined && adj.offset.end !== undefined) {
         potentialWords.push({
           word: adj.text,
           pos: 'adjective',
-          position: position,
-          textIndex: Math.floor(position / (text.length / allWords.length))
+          startIndex: adj.offset.start,
+          endIndex: adj.offset.end
         });
       }
     });
     
-    // Sort by position and select evenly distributed words
-    potentialWords.sort((a, b) => a.position - b.position);
+    // Sort by position and remove duplicates
+    potentialWords.sort((a, b) => a.startIndex - b.startIndex);
+    
+    // Remove duplicates based on position
+    const uniqueWords = potentialWords.filter((word, index, array) => {
+      return index === 0 || word.startIndex !== array[index - 1].startIndex;
+    });
     
     const selectedWords: WordToReplace[] = [];
-    const minDistance = Math.floor(allWords.length / targetWordCount);
-    let lastSelectedIndex = -minDistance;
     
-    potentialWords.forEach((word, index) => {
-      if (selectedWords.length < targetWordCount && 
-          word.textIndex - lastSelectedIndex >= minDistance) {
-        selectedWords.push({
-          id: `${word.pos}-${selectedWords.length}`,
-          original: word.word,
-          partOfSpeech: word.pos,
-          index: selectedWords.length,
-          position: word.position
-        });
-        lastSelectedIndex = word.textIndex;
-      }
+    uniqueWords.forEach((word, index) => {
+      selectedWords.push({
+        id: `${word.pos}-${index}`,
+        original: word.word,
+        partOfSpeech: word.pos,
+        index: index,
+        startIndex: word.startIndex,
+        endIndex: word.endIndex
+      });
     });
 
     const title = generateStoryTitle(text, selectedWords);
@@ -213,8 +206,14 @@ function App() {
     setStoryTitle(storyData.title);
     
     let template = inputText;
-    storyData.wordsToReplace.forEach((word, index) => {
-      template = template.replace(new RegExp(`\\b${word.original}\\b`, 'i'), `(${index + 1})`);
+    
+    // Sort words by startIndex in descending order to avoid index shifting
+    const sortedWords = [...storyData.wordsToReplace].sort((a, b) => b.startIndex - a.startIndex);
+    
+    sortedWords.forEach((word) => {
+      template = template.substring(0, word.startIndex) + 
+                 `(${word.index + 1}) ___________` + 
+                 template.substring(word.endIndex);
     });
     
     setStaticTemplate(template);
@@ -281,10 +280,14 @@ function App() {
   const generateSillyStory = (words: WordToReplace[]) => {
     let result = inputText;
     
-    words.forEach(word => {
+    // Sort words by startIndex in descending order to avoid index shifting
+    const sortedWords = [...words].sort((a, b) => b.startIndex - a.startIndex);
+    
+    sortedWords.forEach(word => {
       if (word.replacement) {
-        // Replace first occurrence of the original word
-        result = result.replace(new RegExp(`\\b${word.original}\\b`, 'i'), word.replacement);
+        result = result.substring(0, word.startIndex) + 
+                 word.replacement + 
+                 result.substring(word.endIndex);
       }
     });
 
@@ -357,8 +360,14 @@ function App() {
     
     // Create story with numbered blanks and underlines
     let storyWithBlanks = inputText;
-    wordsToReplace.forEach((word, index) => {
-      storyWithBlanks = storyWithBlanks.replace(new RegExp(`\\b${word.original}\\b`, 'i'), `(${index + 1}) ___________`);
+    
+    // Sort words by startIndex in descending order to avoid index shifting
+    const sortedWords = [...wordsToReplace].sort((a, b) => b.startIndex - a.startIndex);
+    
+    sortedWords.forEach((word) => {
+      storyWithBlanks = storyWithBlanks.substring(0, word.startIndex) + 
+                        `(${word.index + 1}) ___________` + 
+                        storyWithBlanks.substring(word.endIndex);
     });
     
     // Split story into lines
