@@ -4,16 +4,11 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import nlp from 'compromise';
 import InteractiveModeForm, { WordToReplace } from './components/InteractiveModeForm';
+import Chatbot, { ChatMessage } from './components/Chatbot';
 
 interface StoryData {
   title: string;
   wordsToReplace: WordToReplace[];
-}
-
-interface ChatMessage {
-  sender: 'bot' | 'user';
-  text: string;
-  timestamp: number;
 }
 
 enum GameMode {
@@ -41,7 +36,6 @@ function App() {
   const [gameState, setGameState] = useState<GameState>(GameState.Setup);
   const [interactiveReplacements, setInteractiveReplacements] = useState<{[key: string]: string}>({});
   const storyRef = useRef<HTMLDivElement>(null);
-  const chatEndRef = useRef<HTMLDivElement>(null);
 
   const generateStoryTitle = (text: string, words: WordToReplace[]): string => {
     const titles = [
@@ -82,10 +76,6 @@ function App() {
     // Use a random title from the list
     return titles[Math.floor(Math.random() * titles.length)];
   };
-
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [chatMessages]);
 
   const analyzeTextForReplacements = (text: string): StoryData => {
     const doc = nlp(text);
@@ -426,13 +416,6 @@ function App() {
     setGameState(GameState.Setup);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleUserResponse();
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 p-4">
       <div className="max-w-4xl mx-auto">
@@ -607,56 +590,12 @@ function App() {
 
         {/* Chatbot Interface */}
         {gameState === GameState.Playing && mode === GameMode.Chatbot && (
-          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 mb-6">
-            {/* Chat Messages */}
-            <div className="h-96 overflow-y-auto p-6 space-y-4">
-              {chatMessages.map((message, index) => (
-                <div
-                  key={index}
-                  className={`flex items-start gap-3 ${
-                    message.sender === 'user' ? 'flex-row-reverse' : ''
-                  }`}
-                >
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                    message.sender === 'bot' 
-                      ? 'bg-purple-100 text-purple-600' 
-                      : 'bg-blue-100 text-blue-600'
-                  }`}>
-                    {message.sender === 'bot' ? <Bot className="w-4 h-4" /> : <User className="w-4 h-4" />}
-                  </div>
-                  <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
-                    message.sender === 'bot'
-                      ? 'bg-gray-100 text-gray-800'
-                      : 'bg-gradient-to-r from-purple-600 to-blue-600 text-white'
-                  }`}>
-                    <p className="text-sm">{message.text}</p>
-                  </div>
-                </div>
-              ))}
-              <div ref={chatEndRef} />
-            </div>
-
-            {/* Chat Input */}
-            <div className="border-t border-gray-200 p-4">
-              <div className="flex gap-3">
-                <input
-                  type="text"
-                  value={userResponse}
-                  onChange={(e) => setUserResponse(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Type your word here..."
-                  className="flex-1 p-3 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all duration-200"
-                />
-                <button
-                  onClick={handleUserResponse}
-                  disabled={!userResponse.trim()}
-                  className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-3 rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                >
-                  <Send className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </div>
+          <Chatbot
+            chatMessages={chatMessages}
+            userResponse={userResponse}
+            setUserResponse={setUserResponse}
+            onSendMessage={handleUserResponse}
+          />
         )}
 
         {/* Completed Story */}
