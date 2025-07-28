@@ -450,7 +450,7 @@ function App() {
                   mode === GameMode.Interactive
                     ? 'shadow-xl'
                     : 'hover:shadow-lg'
-                }`}
+                } transform hover:scale-105 transition-all duration-200`}
                 style={{
                   backgroundColor: mode === GameMode.Interactive ? '#2A9D8F' : '#F4A261',
                   borderColor: mode === GameMode.Interactive ? '#264653' : '#2A9D8F',
@@ -469,7 +469,7 @@ function App() {
                   mode === GameMode.Static
                     ? 'shadow-xl'
                     : 'hover:shadow-lg'
-                }`}
+                } transform hover:scale-105 transition-all duration-200`}
                 style={{
                   backgroundColor: mode === GameMode.Static ? '#2A9D8F' : '#F4A261',
                   borderColor: mode === GameMode.Static ? '#264653' : '#2A9D8F',
@@ -488,7 +488,7 @@ function App() {
                   mode === GameMode.Chatbot
                     ? 'shadow-xl'
                     : 'hover:shadow-lg'
-                }`}
+                } transform hover:scale-105 transition-all duration-200`}
                 style={{
                   backgroundColor: mode === GameMode.Chatbot ? '#2A9D8F' : '#F4A261',
                   borderColor: mode === GameMode.Chatbot ? '#264653' : '#2A9D8F',
@@ -528,7 +528,7 @@ function App() {
                   setGameState(GameState.Playing);
                 }}
                 disabled={!inputText.trim()}
-                className="mt-6 flex items-center gap-3 text-white px-8 py-4 rounded-2xl font-black text-lg shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed border-4"
+                className="mt-6 flex items-center gap-3 text-white px-8 py-4 rounded-2xl font-black text-lg shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed border-4 transform hover:scale-105 transition-all duration-200"
                 style={{backgroundColor: '#2A9D8F', borderColor: '#264653'}}
               >
                 <FileText className="w-6 h-6" />
@@ -538,7 +538,7 @@ function App() {
               <button
                 onClick={generateStaticTemplate}
                 disabled={!inputText.trim()}
-                className="mt-6 flex items-center gap-3 text-white px-8 py-4 rounded-2xl font-black text-lg shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed border-4"
+                className="mt-6 flex items-center gap-3 text-white px-8 py-4 rounded-2xl font-black text-lg shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed border-4 transform hover:scale-105 transition-all duration-200"
                 style={{backgroundColor: '#2A9D8F', borderColor: '#264653'}}
               >
                 <FileText className="w-6 h-6" />
@@ -548,7 +548,7 @@ function App() {
               <button
                 onClick={startChatbotGame}
                 disabled={!inputText.trim()}
-                className="mt-6 flex items-center gap-3 text-white px-8 py-4 rounded-2xl font-black text-lg shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed border-4"
+                className="mt-6 flex items-center gap-3 text-white px-8 py-4 rounded-2xl font-black text-lg shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed border-4 transform hover:scale-105 transition-all duration-200"
                 style={{backgroundColor: '#2A9D8F', borderColor: '#264653'}}
               >
                 <Bot className="w-6 h-6" />
@@ -611,34 +611,34 @@ function App() {
         <div className="rounded-3xl p-8 border-4 shadow-2xl" style={{backgroundColor: '#F4A261', borderColor: '#2A9D8F'}}>
           <h4 className="text-2xl font-black mb-6 text-center" style={{color: '#264653'}}>🎯 How to Play This AWESOME Game! 🎯</h4>
           <ol className="list-none space-y-4 font-bold text-lg" style={{color: '#264653'}}>
-            <li className="flex items-center gap-3 p-4 rounded-2xl border-2" style={{backgroundColor: '#F9C74F', borderColor: '#2A9D8F'}}>
+            <li className="flex items-center gap-3 p-4 rounded-2xl border-2 transform hover:scale-102 transition-all duration-200" style={{backgroundColor: '#F9C74F', borderColor: '#2A9D8F'}}>
               <span className="text-white w-8 h-8 rounded-full flex items-center justify-center font-black" style={{backgroundColor: '#2A9D8F'}}>1</span>
               Write or paste a complete story in the text area 📝
             </li>
-            <li className="flex items-center gap-3 p-4 rounded-2xl border-2" style={{backgroundColor: '#F9C74F', borderColor: '#2A9D8F'}}>
+            <li className="flex items-center gap-3 p-4 rounded-2xl border-2 transform hover:scale-102 transition-all duration-200" style={{backgroundColor: '#F9C74F', borderColor: '#2A9D8F'}}>
               <span className="text-white w-8 h-8 rounded-full flex items-center justify-center font-black" style={{backgroundColor: '#2A9D8F'}}>2</span>
               Choose your preferred mode:
             </li>
             <ul className="list-none ml-12 space-y-2 text-base">
-              <li className="flex items-center gap-2 p-3 rounded-xl border-2" style={{backgroundColor: '#E9C46A', borderColor: '#2A9D8F'}}>
+              <li className="flex items-center gap-2 p-3 rounded-xl border-2 transform hover:scale-102 transition-all duration-200" style={{backgroundColor: '#E9C46A', borderColor: '#2A9D8F'}}>
                 <span>🎯</span> <strong>Interactive:</strong> Fill in words through the website!
               </li>
-              <li className="flex items-center gap-2 p-3 rounded-xl border-2" style={{backgroundColor: '#E9C46A', borderColor: '#2A9D8F'}}>
+              <li className="flex items-center gap-2 p-3 rounded-xl border-2 transform hover:scale-102 transition-all duration-200" style={{backgroundColor: '#E9C46A', borderColor: '#2A9D8F'}}>
                 <span>📝</span> <strong>Static:</strong> Get a template with numbered blanks!
               </li>
-              <li className="flex items-center gap-2 p-3 rounded-xl border-2" style={{backgroundColor: '#E9C46A', borderColor: '#2A9D8F'}}>
+              <li className="flex items-center gap-2 p-3 rounded-xl border-2 transform hover:scale-102 transition-all duration-200" style={{backgroundColor: '#E9C46A', borderColor: '#2A9D8F'}}>
                 <span>🤖</span> <strong>Chatbot:</strong> Chat with AI for guidance!
               </li>
             </ul>
-            <li className="flex items-center gap-3 p-4 rounded-2xl border-2" style={{backgroundColor: '#F9C74F', borderColor: '#2A9D8F'}}>
+            <li className="flex items-center gap-3 p-4 rounded-2xl border-2 transform hover:scale-102 transition-all duration-200" style={{backgroundColor: '#F9C74F', borderColor: '#2A9D8F'}}>
               <span className="text-white w-8 h-8 rounded-full flex items-center justify-center font-black" style={{backgroundColor: '#2A9D8F'}}>3</span>
               Let AI find the perfect words to replace! 🔍
             </li>
-            <li className="flex items-center gap-3 p-4 rounded-2xl border-2" style={{backgroundColor: '#F9C74F', borderColor: '#2A9D8F'}}>
+            <li className="flex items-center gap-3 p-4 rounded-2xl border-2 transform hover:scale-102 transition-all duration-200" style={{backgroundColor: '#F9C74F', borderColor: '#2A9D8F'}}>
               <span className="text-white w-8 h-8 rounded-full flex items-center justify-center font-black" style={{backgroundColor: '#2A9D8F'}}>4</span>
               Add your SILLY replacement words! 🤪
             </li>
-            <li className="flex items-center gap-3 p-4 rounded-2xl border-2" style={{backgroundColor: '#F9C74F', borderColor: '#2A9D8F'}}>
+            <li className="flex items-center gap-3 p-4 rounded-2xl border-2 transform hover:scale-102 transition-all duration-200" style={{backgroundColor: '#F9C74F', borderColor: '#2A9D8F'}}>
               <span className="text-white w-8 h-8 rounded-full flex items-center justify-center font-black" style={{backgroundColor: '#2A9D8F'}}>5</span>
               Download or share your hilarious creation! 🎉
             </li>
