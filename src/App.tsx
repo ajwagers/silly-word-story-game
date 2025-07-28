@@ -24,9 +24,21 @@ interface ChatMessage {
   timestamp: number;
 }
 
+enum GameMode {
+  Interactive = 'interactive',
+  Static = 'static',
+  Chatbot = 'chatbot',
+}
+
+enum GameState {
+  Setup = 'setup',
+  Playing = 'playing',
+  Completed = 'completed',
+}
+
 function App() {
   const [inputText, setInputText] = useState('The quick brown fox jumps over the lazy dog. The beautiful princess danced gracefully in the moonlight while the brave knight fought the terrible dragon.');
-  const [mode, setMode] = useState<'interactive' | 'static' | 'chatbot'>('interactive');
+  const [mode, setMode] = useState<GameMode>(GameMode.Interactive);
   const [wordsToReplace, setWordsToReplace] = useState<WordToReplace[]>([]);
   const [storyTitle, setStoryTitle] = useState<string>('');
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -34,7 +46,7 @@ function App() {
   const [userResponse, setUserResponse] = useState('');
   const [completedStory, setCompletedStory] = useState('');
   const [staticTemplate, setStaticTemplate] = useState('');
-  const [gameState, setGameState] = useState<'setup' | 'playing' | 'completed'>('setup');
+  const [gameState, setGameState] = useState<GameState>(GameState.Setup);
   const [interactiveReplacements, setInteractiveReplacements] = useState<{[key: string]: string}>({});
   const storyRef = useRef<HTMLDivElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -171,8 +183,8 @@ function App() {
     const storyData = analyzeTextForReplacements(inputText);
     setWordsToReplace(storyData.wordsToReplace);
     setStoryTitle(storyData.title);
-    setCurrentWordIndex(0);
-    setGameState('playing');
+    setCurrentWordIndex(0);    
+    setGameState(GameState.Playing);
     
     const welcomeMessage: ChatMessage = {
       sender: 'bot',
@@ -205,7 +217,7 @@ function App() {
     });
 
     setCompletedStory(result);
-    setGameState('completed');
+    setGameState(GameState.Completed);
   };
 
   const generateStaticTemplate = () => {
@@ -225,7 +237,7 @@ function App() {
     });
 
     setStaticTemplate(template);
-    setGameState('completed');
+    setGameState(GameState.Completed);
   };
 
   const handleInteractiveReplacementChange = (wordId: string, value: string) => {
@@ -287,16 +299,18 @@ function App() {
 
   const generateSillyStory = (words: WordToReplace[]) => {
     let result = inputText;
+    // Sort words by position to replace from the end, avoiding index shifts
+    const sortedWords = [...words].sort((a, b) => b.position - a.position);
     
-    words.forEach(word => {
-      if (word.replacement) {
-        // Replace first occurrence of the original word
-        result = result.replace(new RegExp(`\\b${word.original}\\b`, 'i'), word.replacement);
+    sortedWords.forEach(word => {
+      if (word.replacement?.trim()) {
+        // Use position to replace the exact word, preventing issues with duplicate words
+        result = result.substring(0, word.position) + word.replacement + result.substring(word.position + word.original.length);
       }
     });
 
     setCompletedStory(result);
-    setGameState('completed');
+    setGameState(GameState.Completed);
 
     const finalMessage: ChatMessage = {
       sender: 'bot',
@@ -364,10 +378,14 @@ function App() {
     
     // Create story with numbered blanks and underlines
     let storyWithBlanks = inputText;
-    wordsToReplace.forEach((word, index) => {
-      storyWithBlanks = storyWithBlanks.replace(new RegExp(`\\b${word.original}\\b`, 'i'), `(${index + 1}) ___________`);
+    // Sort words by position to replace from the end, avoiding index shifts
+    const sortedWords = [...wordsToReplace].sort((a, b) => b.position - a.position);
+
+    sortedWords.forEach((word) => {
+      const indexInOriginalList = wordsToReplace.findIndex(w => w.id === word.id);
+      storyWithBlanks = storyWithBlanks.substring(0, word.position) + `(${indexInOriginalList + 1}) ___________` + storyWithBlanks.substring(word.position + word.original.length);
     });
-    
+        
     // Split story into lines
     pdf.setFontSize(12);
     pdf.setFont('helvetica', 'normal');
@@ -413,7 +431,7 @@ function App() {
     setCompletedStory('');
     setStaticTemplate('');
     setInteractiveReplacements({});
-    setGameState('setup');
+    setGameState(GameState.Setup);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -438,27 +456,27 @@ function App() {
         </div>
 
         {/* Mode Selection */}
-        {gameState === 'setup' && (
+        {gameState === GameState.Setup && (
           <div className="bg-white rounded-2xl shadow-xl p-6 mb-6 border border-gray-100">
             <h3 className="text-lg font-semibold text-gray-700 mb-4">Choose your mode:</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <button
-                onClick={() => setMode('interactive')}
+                onClick={() => setMode(GameMode.Interactive)}
                 className={`flex-1 p-4 rounded-xl border-2 transition-all duration-200 ${
-                  mode === 'interactive'
+                  mode === GameMode.Interactive
                     ? 'border-purple-500 bg-purple-50 text-purple-700'
                     : 'border-gray-200 hover:border-gray-300'
                 }`}
               >
                 <div className="text-center">
                   <h4 className="font-semibold mb-2">Interactive Mode</h4>
-                  <p className="text-sm text-gray-600">Fill in all words at once, then generate your story</p>
+                  <p className="text-sm text-gray-600">Fill in all words at once, then generate your story.</p>
                 </div>
               </button>
               <button
-                onClick={() => setMode('static')}
+                onClick={() => setMode(GameMode.Static)}
                 className={`flex-1 p-4 rounded-xl border-2 transition-all duration-200 ${
-                  mode === 'static'
+                  mode === GameMode.Static
                     ? 'border-purple-500 bg-purple-50 text-purple-700'
                     : 'border-gray-200 hover:border-gray-300'
                 }`}
@@ -469,9 +487,9 @@ function App() {
                 </div>
               </button>
               <button
-                onClick={() => setMode('chatbot')}
+                onClick={() => setMode(GameMode.Chatbot)}
                 className={`flex-1 p-4 rounded-xl border-2 transition-all duration-200 ${
-                  mode === 'chatbot'
+                  mode === GameMode.Chatbot
                     ? 'border-purple-500 bg-purple-50 text-purple-700'
                     : 'border-gray-200 hover:border-gray-300'
                 }`}
@@ -486,7 +504,7 @@ function App() {
         )}
 
         {/* Setup Phase */}
-        {gameState === 'setup' && (
+        {gameState === GameState.Setup && (
           <div className="bg-white rounded-2xl shadow-xl p-6 mb-6 border border-gray-100">
             <label className="block text-lg font-semibold text-gray-700 mb-3">
               Enter your complete story:
@@ -498,21 +516,21 @@ function App() {
               placeholder="Write a complete story here. I'll find words to make it silly!"
             />
             
-            {mode === 'interactive' ? (
+            {mode === GameMode.Interactive ? (
               <button
                 onClick={() => {
                   const storyData = analyzeTextForReplacements(inputText);
                   setWordsToReplace(storyData.wordsToReplace);
                   setStoryTitle(storyData.title);
-                  setGameState('playing');
+                  setGameState(GameState.Playing);
                 }}
                 disabled={!inputText.trim()}
                 className="mt-4 flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-3 rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
                 <FileText className="w-4 h-4" />
                 Analyze Story
-              </button>
-            ) : mode === 'static' ? (
+              </button>            
+            ) : mode === GameMode.Static ? (
               <button
                 onClick={generateStaticTemplate}
                 disabled={!inputText.trim()}
@@ -535,7 +553,7 @@ function App() {
         )}
 
         {/* Interactive Mode Form */}
-        {gameState === 'playing' && mode === 'interactive' && wordsToReplace.length > 0 && (
+        {gameState === GameState.Playing && mode === GameMode.Interactive && wordsToReplace.length > 0 && (
           <div className="bg-white rounded-2xl shadow-xl p-6 mb-6 border border-gray-100">
             <div className="mb-4">
               <h2 className="text-2xl font-bold text-gray-800 text-center">{storyTitle}</h2>
@@ -568,7 +586,7 @@ function App() {
         )}
 
         {/* Static Mode Template */}
-        {gameState === 'completed' && mode === 'static' && staticTemplate && (
+        {gameState === GameState.Completed && mode === GameMode.Static && staticTemplate && (
           <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100 mb-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl font-bold text-gray-800">{storyTitle}</h2>
@@ -618,7 +636,7 @@ function App() {
         )}
 
         {/* Chatbot Interface */}
-        {gameState === 'playing' && mode === 'chatbot' && (
+        {gameState === GameState.Playing && mode === GameMode.Chatbot && (
           <div className="bg-white rounded-2xl shadow-xl border border-gray-100 mb-6">
             {/* Chat Messages */}
             <div className="h-96 overflow-y-auto p-6 space-y-4">
@@ -672,7 +690,7 @@ function App() {
         )}
 
         {/* Completed Story */}
-        {gameState === 'completed' && completedStory && mode !== 'static' && (
+        {gameState === GameState.Completed && completedStory && mode !== GameMode.Static && (
           <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100 mb-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl font-bold text-gray-800">{storyTitle}</h2>
