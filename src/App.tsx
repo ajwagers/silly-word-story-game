@@ -453,7 +453,6 @@ function App() {
             <div className="relative">
               <div className="text-4xl animate-spin">🎭</div>
             </div>
-          </div>
           <p className="text-purple-800 text-xl font-bold bg-yellow-300 px-6 py-3 rounded-full border-4 border-purple-600 shadow-lg transform hover:scale-105 transition-transform duration-200">
             🌟 Let AI find words in your story and replace them with SUPER SILLY alternatives! 🌟
           </p>
@@ -643,10 +642,7 @@ function App() {
               Add your SILLY replacement words! 🤪
             </li>
             <li className="flex items-center gap-3 bg-white/60 p-4 rounded-2xl border-2 border-orange-300">
-              <span className="bg-orange-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-black">5</span>
-              Download or share your hilarious creation! 🎉
-            </li>
-          </ol>
+export default App;
         </div>
       </div>
     </div>
