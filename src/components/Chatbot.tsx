@@ -58,8 +58,7 @@ const Chatbot: React.FC<ChatbotProps> = ({
               style={{
                 backgroundColor: message.sender === 'bot' ? '#264653' : '#2A9D8F',
                 borderColor: 'white'
-              }}
-            >
+              }}>
               {message.sender === 'bot' ? <Bot className="w-6 h-6" /> : <User className="w-6 h-6" />}
             </div>
             <div className={`max-w-xs lg:max-w-md px-6 py-4 rounded-2xl border-4 shadow-lg ${
@@ -71,8 +70,7 @@ const Chatbot: React.FC<ChatbotProps> = ({
                 backgroundColor: message.sender === 'bot' ? '#F9C74F' : '#2A9D8F',
                 borderColor: message.sender === 'bot' ? '#264653' : 'white',
                 color: message.sender === 'bot' ? '#264653' : 'white'
-              }}
-            >
+              }}>
               <p className="text-base font-bold">{message.text}</p>
             </div>
           </div>
