@@ -70,4 +70,63 @@ const GameSetup: React.FC<GameSetupProps> = ({
       </div>
 
       {/* Story Input and Start Button */}
-      <div className="bg-white rounded-2xl shadow-xl p-6 mb-6 border border-
+      <div className="bg-white rounded-2xl shadow-xl p-6 mb-6 border border-gray-100">
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="story-input" className="block text-lg font-semibold mb-2" style={{color: '#264653'}}>
+              📝 Enter your story template:
+            </label>
+            <textarea
+              id="story-input"
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              placeholder="Once upon a time, there was a [adjective] [noun] who lived in a [place]..."
+              className="w-full h-32 p-4 border-2 rounded-xl text-lg font-medium resize-none"
+              style={{backgroundColor: '#F9C74F', borderColor: '#2A9D8F', color: '#264653'}}
+            />
+          </div>
+          
+          <div className="flex gap-4">
+            {mode === GameMode.Interactive && (
+              <button
+                onClick={onAnalyze}
+                disabled={!inputText.trim()}
+                className="flex-1 px-6 py-4 rounded-xl font-bold text-lg border-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{backgroundColor: '#2A9D8F', borderColor: '#264653', color: 'white'}}
+              >
+                <FileText className="w-5 h-5 mr-2 inline" />
+                🎯 Find Words to Replace!
+              </button>
+            )}
+            
+            {mode === GameMode.Static && (
+              <button
+                onClick={onGenerateTemplate}
+                disabled={!inputText.trim()}
+                className="flex-1 px-6 py-4 rounded-xl font-bold text-lg border-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{backgroundColor: '#F4A261', borderColor: '#264653', color: 'white'}}
+              >
+                <FileText className="w-5 h-5 mr-2 inline" />
+                📋 Generate Template!
+              </button>
+            )}
+            
+            {mode === GameMode.Chatbot && (
+              <button
+                onClick={onStartChatbot}
+                disabled={!inputText.trim()}
+                className="flex-1 px-6 py-4 rounded-xl font-bold text-lg border-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{backgroundColor: '#E9C46A', borderColor: '#264653', color: '#264653'}}
+              >
+                <Bot className="w-5 h-5 mr-2 inline" />
+                🤖 Start Chat Adventure!
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default GameSetup;

@@ -54,7 +54,7 @@ const Chatbot: React.FC<ChatbotProps> = ({
               message.sender === 'bot' 
                 ? 'text-white' 
                 : 'text-white'
-            }`}>
+            }`}
               style={{
                 backgroundColor: message.sender === 'bot' ? '#264653' : '#2A9D8F',
                 borderColor: 'white'
@@ -66,7 +66,7 @@ const Chatbot: React.FC<ChatbotProps> = ({
               message.sender === 'bot'
                 ? ''
                 : ''
-            }`}>
+            }`}
               style={{
                 backgroundColor: message.sender === 'bot' ? '#F9C74F' : '#2A9D8F',
                 borderColor: message.sender === 'bot' ? '#264653' : 'white',
