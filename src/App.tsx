@@ -418,61 +418,83 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-pink-200 via-yellow-200 via-green-200 to-blue-200 p-4 relative overflow-hidden">
+      {/* Floating decorative elements */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-10 left-10 w-8 h-8 bg-yellow-400 rounded-full animate-bounce" style={{animationDelay: '0s'}}></div>
+        <div className="absolute top-20 right-20 w-6 h-6 bg-pink-400 rounded-full animate-bounce" style={{animationDelay: '0.5s'}}></div>
+        <div className="absolute top-40 left-1/4 w-4 h-4 bg-green-400 rounded-full animate-bounce" style={{animationDelay: '1s'}}></div>
+        <div className="absolute top-60 right-1/3 w-5 h-5 bg-blue-400 rounded-full animate-bounce" style={{animationDelay: '1.5s'}}></div>
+        <div className="absolute bottom-20 left-20 w-7 h-7 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '2s'}}></div>
+        <div className="absolute bottom-40 right-10 w-6 h-6 bg-orange-400 rounded-full animate-bounce" style={{animationDelay: '2.5s'}}></div>
+      </div>
+      
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-8 relative">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <FileText className="w-8 h-8 text-purple-600" />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            <div className="relative">
+              <FileText className="w-12 h-12 text-yellow-500 animate-pulse" />
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-400 rounded-full animate-ping"></div>
+            </div>
+            <h1 className="text-5xl font-black bg-gradient-to-r from-pink-500 via-purple-500 via-blue-500 to-green-500 bg-clip-text text-transparent animate-pulse">
               Silly Word Story Game
             </h1>
+            <div className="relative">
+              <div className="text-4xl animate-spin">🎭</div>
+            </div>
           </div>
-          <p className="text-gray-600 text-lg">Let AI find words in your story and replace them with silly alternatives!</p>
+          <p className="text-purple-800 text-xl font-bold bg-yellow-200 px-6 py-3 rounded-full border-4 border-purple-400 shadow-lg transform hover:scale-105 transition-transform duration-200">
+            🌟 Let AI find words in your story and replace them with SUPER SILLY alternatives! 🌟
+          </p>
         </div>
 
         {/* Mode Selection */}
         {gameState === GameState.Setup && (
-          <div className="bg-white rounded-2xl shadow-xl p-6 mb-6 border border-gray-100">
-            <h3 className="text-lg font-semibold text-gray-700 mb-4">Choose your mode:</h3>
+          <div className="bg-gradient-to-r from-yellow-100 to-pink-100 rounded-3xl shadow-2xl p-8 mb-6 border-4 border-rainbow-gradient relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-yellow-200/20 to-pink-200/20 animate-pulse"></div>
+            <h3 className="text-2xl font-black text-purple-800 mb-6 text-center relative z-10">🎮 Choose Your Adventure Mode! 🎮</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <button
                 onClick={() => setMode(GameMode.Interactive)}
-                className={`flex-1 p-4 rounded-xl border-2 transition-all duration-200 ${
+                className={`flex-1 p-6 rounded-2xl border-4 transition-all duration-300 transform hover:scale-105 hover:rotate-1 relative z-10 ${
                   mode === GameMode.Interactive
-                    ? 'border-purple-500 bg-purple-50 text-purple-700'
-                    : 'border-gray-200 hover:border-gray-300'
+                    ? 'border-purple-500 bg-gradient-to-br from-purple-200 to-pink-200 text-purple-800 shadow-xl'
+                    : 'border-orange-300 bg-gradient-to-br from-orange-100 to-yellow-100 hover:border-orange-400 hover:shadow-lg'
                 }`}
               >
                 <div className="text-center">
-                  <h4 className="font-semibold mb-2">Interactive Mode</h4>
-                  <p className="text-sm text-gray-600">Fill in all words at once, then generate your story.</p>
+                  <div className="text-3xl mb-2">🎯</div>
+                  <h4 className="font-black mb-3 text-lg">Interactive Mode</h4>
+                  <p className="text-sm font-semibold">Fill in all words at once, then generate your story!</p>
                 </div>
               </button>
               <button
                 onClick={() => setMode(GameMode.Static)}
-                className={`flex-1 p-4 rounded-xl border-2 transition-all duration-200 ${
+                className={`flex-1 p-6 rounded-2xl border-4 transition-all duration-300 transform hover:scale-105 hover:rotate-1 relative z-10 ${
                   mode === GameMode.Static
-                    ? 'border-purple-500 bg-purple-50 text-purple-700'
-                    : 'border-gray-200 hover:border-gray-300'
+                    ? 'border-purple-500 bg-gradient-to-br from-purple-200 to-pink-200 text-purple-800 shadow-xl'
+                    : 'border-green-300 bg-gradient-to-br from-green-100 to-blue-100 hover:border-green-400 hover:shadow-lg'
                 }`}
               >
                 <div className="text-center">
-                  <h4 className="font-semibold mb-2">Static Mode</h4>
-                  <p className="text-sm text-gray-600">Get a word list and template to fill in on your own later.</p>
+                  <div className="text-3xl mb-2">📝</div>
+                  <h4 className="font-black mb-3 text-lg">Static Mode</h4>
+                  <p className="text-sm font-semibold">Get a word list and template to fill in later!</p>
                 </div>
               </button>
               <button
                 onClick={() => setMode(GameMode.Chatbot)}
-                className={`flex-1 p-4 rounded-xl border-2 transition-all duration-200 ${
+                className={`flex-1 p-6 rounded-2xl border-4 transition-all duration-300 transform hover:scale-105 hover:rotate-1 relative z-10 ${
                   mode === GameMode.Chatbot
-                    ? 'border-purple-500 bg-purple-50 text-purple-700'
-                    : 'border-gray-200 hover:border-gray-300'
+                    ? 'border-purple-500 bg-gradient-to-br from-purple-200 to-pink-200 text-purple-800 shadow-xl'
+                    : 'border-blue-300 bg-gradient-to-br from-blue-100 to-purple-100 hover:border-blue-400 hover:shadow-lg'
                 }`}
               >
                 <div className="text-center">
-                  <h4 className="font-semibold mb-2">Chatbot Mode</h4>
-                  <p className="text-sm text-gray-600">Interactive conversation with AI guidance</p>
+                  <div className="text-3xl mb-2">🤖</div>
+                  <h4 className="font-black mb-3 text-lg">Chatbot Mode</h4>
+                  <p className="text-sm font-semibold">Chat with AI for super fun guidance!</p>
                 </div>
               </button>
             </div>
@@ -481,15 +503,16 @@ function App() {
 
         {/* Setup Phase */}
         {gameState === GameState.Setup && (
-          <div className="bg-white rounded-2xl shadow-xl p-6 mb-6 border border-gray-100">
-            <label className="block text-lg font-semibold text-gray-700 mb-3">
-              Enter your complete story:
+          <div className="bg-gradient-to-br from-green-100 to-blue-100 rounded-3xl shadow-2xl p-8 mb-6 border-4 border-green-400 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-green-200/20 to-blue-200/20 animate-pulse"></div>
+            <label className="block text-2xl font-black text-green-800 mb-4 text-center relative z-10">
+              ✨ Enter Your Amazing Story Here! ✨
             </label>
             <textarea
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              className="w-full h-32 p-4 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all duration-200 resize-none"
-              placeholder="Write a complete story here. I'll find words to make it silly!"
+              className="w-full h-40 p-6 border-4 border-yellow-300 rounded-2xl focus:border-pink-500 focus:ring-4 focus:ring-pink-200 transition-all duration-300 resize-none text-lg font-semibold bg-gradient-to-br from-yellow-50 to-orange-50 relative z-10 shadow-inner"
+              placeholder="🌈 Write your amazing story here! I'll find the perfect words to make it SUPER SILLY! 🌈"
             />
             
             {mode === GameMode.Interactive ? (
@@ -501,28 +524,28 @@ function App() {
                   setGameState(GameState.Playing);
                 }}
                 disabled={!inputText.trim()}
-                className="mt-4 flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-3 rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                className="mt-6 flex items-center gap-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-4 rounded-2xl hover:from-pink-600 hover:to-purple-700 transition-all duration-300 font-black text-lg shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none relative z-10 border-4 border-white"
               >
-                <FileText className="w-4 h-4" />
-                Analyze Story
+                <FileText className="w-6 h-6" />
+                🔍 Analyze My Story!
               </button>            
             ) : mode === GameMode.Static ? (
               <button
                 onClick={generateStaticTemplate}
                 disabled={!inputText.trim()}
-                className="mt-4 flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-3 rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                className="mt-6 flex items-center gap-3 bg-gradient-to-r from-green-500 to-blue-600 text-white px-8 py-4 rounded-2xl hover:from-green-600 hover:to-blue-700 transition-all duration-300 font-black text-lg shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none relative z-10 border-4 border-white"
               >
-                <FileText className="w-4 h-4" />
-                Generate Template
+                <FileText className="w-6 h-6" />
+                📋 Make My Template!
               </button>
             ) : (
               <button
                 onClick={startChatbotGame}
                 disabled={!inputText.trim()}
-                className="mt-4 flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-3 rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                className="mt-6 flex items-center gap-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-4 rounded-2xl hover:from-blue-600 hover:to-purple-700 transition-all duration-300 font-black text-lg shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none relative z-10 border-4 border-white"
               >
-                <Bot className="w-4 h-4" />
-                Start Chatbot Game
+                <Bot className="w-6 h-6" />
+                🤖 Start Chatbot Fun!
               </button>
             )}
           </div>
@@ -578,19 +601,41 @@ function App() {
         )}
 
         {/* Instructions */}
-        <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-gray-200">
-          <h4 className="text-lg font-semibold text-gray-700 mb-3">How to play:</h4>
-          <ol className="list-decimal list-inside space-y-2 text-gray-600">
-            <li>Write or paste a complete story in the text area</li>
-            <li>Choose your preferred mode:</li>
-            <ul className="list-disc list-inside ml-4 mt-1 space-y-1 text-sm">
-              <li><strong>Interactive:</strong> Fill in words through the website interface</li>
-              <li><strong>Static:</strong> Get a traditional MadLibs-style template with numbered blanks</li>
-              <li><strong>Chatbot:</strong> Interactive conversation with AI guidance</li>
+        <div className="bg-gradient-to-br from-orange-100 to-red-100 rounded-3xl p-8 border-4 border-orange-400 shadow-2xl relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-orange-200/20 to-red-200/20 animate-pulse"></div>
+          <h4 className="text-2xl font-black text-orange-800 mb-6 text-center relative z-10">🎯 How to Play This AWESOME Game! 🎯</h4>
+          <ol className="list-none space-y-4 text-orange-800 font-bold text-lg relative z-10">
+            <li className="flex items-center gap-3 bg-white/60 p-4 rounded-2xl border-2 border-orange-300">
+              <span className="bg-orange-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-black">1</span>
+              Write or paste a complete story in the text area 📝
+            </li>
+            <li className="flex items-center gap-3 bg-white/60 p-4 rounded-2xl border-2 border-orange-300">
+              <span className="bg-orange-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-black">2</span>
+              Choose your preferred mode:
+            </li>
+            <ul className="list-none ml-12 space-y-2 text-base">
+              <li className="flex items-center gap-2 bg-purple-100 p-3 rounded-xl border-2 border-purple-300">
+                <span>🎯</span> <strong>Interactive:</strong> Fill in words through the website!
+              </li>
+              <li className="flex items-center gap-2 bg-green-100 p-3 rounded-xl border-2 border-green-300">
+                <span>📝</span> <strong>Static:</strong> Get a template with numbered blanks!
+              </li>
+              <li className="flex items-center gap-2 bg-blue-100 p-3 rounded-xl border-2 border-blue-300">
+                <span>🤖</span> <strong>Chatbot:</strong> Chat with AI for guidance!
+              </li>
             </ul>
-            <li>Let AI analyze your text and identify words to replace</li>
-            <li>Provide silly replacement words or use the template offline</li>
-            <li>Download your creation or share it with friends</li>
+            <li className="flex items-center gap-3 bg-white/60 p-4 rounded-2xl border-2 border-orange-300">
+              <span className="bg-orange-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-black">3</span>
+              Let AI find the perfect words to replace! 🔍
+            </li>
+            <li className="flex items-center gap-3 bg-white/60 p-4 rounded-2xl border-2 border-orange-300">
+              <span className="bg-orange-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-black">4</span>
+              Add your SILLY replacement words! 🤪
+            </li>
+            <li className="flex items-center gap-3 bg-white/60 p-4 rounded-2xl border-2 border-orange-300">
+              <span className="bg-orange-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-black">5</span>
+              Download or share your hilarious creation! 🎉
+            </li>
           </ol>
         </div>
       </div>
