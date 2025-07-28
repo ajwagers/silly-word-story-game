@@ -471,9 +471,9 @@ function App() {
                     : 'hover:shadow-lg'
                 } transform hover:scale-105 transition-all duration-200`}
                 style={{
-                  backgroundColor: mode === GameMode.Static ? '#2A9D8F' : '#F4A261',
-                  borderColor: mode === GameMode.Static ? '#264653' : '#2A9D8F',
-                  color: mode === GameMode.Static ? 'white' : '#264653'
+                  backgroundColor: mode === GameMode.Static ? '#2A9D8F' : '#2A9D8F',
+                  borderColor: mode === GameMode.Static ? '#264653' : '#264653',
+                  color: mode === GameMode.Static ? 'white' : 'white'
                 }}
               >
                 <div className="text-center">
@@ -490,9 +490,9 @@ function App() {
                     : 'hover:shadow-lg'
                 } transform hover:scale-105 transition-all duration-200`}
                 style={{
-                  backgroundColor: mode === GameMode.Chatbot ? '#2A9D8F' : '#F4A261',
-                  borderColor: mode === GameMode.Chatbot ? '#264653' : '#2A9D8F',
-                  color: mode === GameMode.Chatbot ? 'white' : '#264653'
+                  backgroundColor: mode === GameMode.Chatbot ? '#2A9D8F' : '#2A9D8F',
+                  borderColor: mode === GameMode.Chatbot ? '#264653' : '#264653',
+                  color: mode === GameMode.Chatbot ? 'white' : 'white'
                 }}
               >
                 <div className="text-center">
