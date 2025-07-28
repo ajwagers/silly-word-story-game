@@ -497,8 +497,8 @@ function App() {
                 onClick={() => setMode(GameMode.Chatbot)}
                 className={`flex-1 p-6 rounded-2xl border-4 transition-all duration-300 transform hover:scale-105 hover:rotate-1 relative z-10 ${
                   mode === GameMode.Chatbot
-                    ? 'border-purple-600 bg-purple-300 text-purple-900 shadow-xl'
-                    : 'border-blue-400 bg-blue-200 hover:border-blue-500 hover:shadow-lg'
+                    ? 'border-purple-500 bg-gradient-to-br from-purple-200 to-pink-200 text-purple-800 shadow-xl'
+                    : 'border-blue-300 bg-gradient-to-br from-blue-100 to-purple-100 hover:border-blue-400 hover:shadow-lg'
                 }`}
               >
                 <div className="text-center">
