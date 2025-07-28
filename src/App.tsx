@@ -212,11 +212,17 @@ function App() {
     setWordsToReplace(storyData.wordsToReplace);
     setStoryTitle(storyData.title);
     
-    let template = inputText;
-    storyData.wordsToReplace.forEach((word, index) => {
-      template = template.replace(new RegExp(`\\b${word.original}\\b`, 'i'), `(${index + 1})`);
+    // Create a copy to modify
+    let template = inputText; 
+    // Sort words by position to replace from the end, avoiding index shifts
+    const sortedWords = [...storyData.wordsToReplace].sort((a, b) => b.position - a.position);
+
+    sortedWords.forEach((word, i) => {
+      const indexInOriginalList = storyData.wordsToReplace.findIndex(w => w.id === word.id);
+      // Use position to replace the exact word, preventing issues with duplicate words
+      template = template.substring(0, word.position) + `(${indexInOriginalList + 1})` + template.substring(word.position + word.original.length);
     });
-    
+
     setStaticTemplate(template);
     setGameState('completed');
   };
