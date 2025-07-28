@@ -192,14 +192,15 @@ function App() {
   };
 
   const generateInteractiveStory = () => {
-    const storyData = analyzeTextForReplacements(inputText);
-    const words = storyData.wordsToReplace;
-    let result = inputText;
-    
-    words.forEach(word => {
+    let result = inputText; 
+    // Sort words by position to replace from the end, avoiding index shifts
+    const sortedWords = [...wordsToReplace].sort((a, b) => b.position - a.position);
+
+    sortedWords.forEach(word => {
       const replacement = interactiveReplacements[word.id];
-      if (replacement) {
-        result = result.replace(new RegExp(`\\b${word.original}\\b`, 'i'), replacement);
+      if (replacement?.trim()) {
+        // Use position to replace the exact word, preventing issues with duplicate words
+        result = result.substring(0, word.position) + replacement + result.substring(word.position + word.original.length);
       }
     });
 
@@ -500,8 +501,9 @@ function App() {
             {mode === 'interactive' ? (
               <button
                 onClick={() => {
-                  const words = analyzeTextForReplacements(inputText);
-                  setWordsToReplace(words);
+                  const storyData = analyzeTextForReplacements(inputText);
+                  setWordsToReplace(storyData.wordsToReplace);
+                  setStoryTitle(storyData.title);
                   setGameState('playing');
                 }}
                 disabled={!inputText.trim()}
@@ -557,6 +559,7 @@ function App() {
             </div>
             <button
               onClick={generateInteractiveStory}
+              className="mt-4 flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-3 rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
               <FileText className="w-4 h-4" />
               Generate Silly Story
