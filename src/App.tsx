@@ -644,7 +644,7 @@ function App() {
             </li>
             <li className="flex items-center gap-3 bg-white/60 p-4 rounded-2xl border-2 border-orange-300">
               <span className="bg-orange-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-black">5</span>
-              Enjoy your hilarious story! 😂
+              Download or share your hilarious creation! 🎉
             </li>
           </ol>
         </div>
