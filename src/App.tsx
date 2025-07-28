@@ -608,7 +608,6 @@ function App() {
         )}
 
         {/* Instructions */}
-        <div className="bg-gradient-to-br from-orange-100 to-red-100 rounded-3xl p-8 border-4 border-orange-400 shadow-2xl relative overflow-hidden">
         <div className="rounded-3xl p-8 border-4 shadow-2xl" style={{backgroundColor: '#F4A261', borderColor: '#2A9D8F'}}>
           <h4 className="text-2xl font-black mb-6 text-center" style={{color: '#264653'}}>🎯 How to Play This AWESOME Game! 🎯</h4>
           <ol className="list-none space-y-4 font-bold text-lg" style={{color: '#264653'}}>
