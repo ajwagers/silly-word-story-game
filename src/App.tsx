@@ -352,7 +352,7 @@ export default function StoryGameApp() {
                     <label htmlFor="story-input" className="block text-lg font-semibold mb-2 text-center lg:text-left text-slate-700">
                       📝 Enter your story:
                     </label>
-                    <textarea
+                    <Textarea
                       id="story-input"
                       value={inputText}
                       onChange={(e) => setInputText(e.target.value)}
