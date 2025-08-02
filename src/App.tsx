@@ -271,15 +271,15 @@ export default function StoryGameApp() {
         {(gameState !== GameState.Setup || window.innerWidth >= 1024) && (
           <>
             <Progress 
-              className="w-full max-w-2xl h-2 lg:h-3 rounded-full bg-indigo-100 z-10 mb-2" 
+              className="w-full max-w-2xl h-2 lg:h-3 rounded-full bg-slate-200 z-10 mb-2" 
               value={gameState === GameState.Setup ? 25 : gameState === GameState.Playing || gameState === GameState.Chatting ? 75 : 100} 
             />
             <div className="flex justify-between w-full max-w-2xl px-1 mb-6 lg:mb-12 text-xs lg:text-sm z-10">
-              <span className="uppercase tracking-wider text-indigo-700 font-semibold">Setup</span>
-              <span className={`uppercase tracking-wider ${gameState === GameState.Playing || gameState === GameState.Chatting || gameState === GameState.Completed ? 'text-indigo-700 font-semibold' : 'text-slate-400'}`}>
+              <span className="uppercase tracking-wider text-teal-700 font-semibold">Setup</span>
+              <span className={`uppercase tracking-wider ${gameState === GameState.Playing || gameState === GameState.Chatting || gameState === GameState.Completed ? 'text-teal-700 font-semibold' : 'text-slate-400'}`}>
                 Play
               </span>
-              <span className={`uppercase tracking-wider ${gameState === GameState.Completed ? 'text-indigo-700 font-semibold' : 'text-slate-400'}`}>
+              <span className={`uppercase tracking-wider ${gameState === GameState.Completed ? 'text-teal-700 font-semibold' : 'text-slate-400'}`}>
                 Complete
               </span>
             </div>
@@ -350,6 +350,7 @@ export default function StoryGameApp() {
                 <div className="space-y-4">
                   <div>
                     <label htmlFor="story-input" className="block text-lg font-semibold mb-2 text-center lg:text-left" style={{color: '#264653'}}>
+                    <label htmlFor="story-input" className="block text-lg font-semibold mb-2 text-center lg:text-left text-slate-700">
                       📝 Enter your story:
                     </label>
                     <textarea
@@ -357,8 +358,7 @@ export default function StoryGameApp() {
                       value={inputText}
                       onChange={(e) => setInputText(e.target.value)}
                       placeholder="Once upon a time, there was a brave knight who lived in a magical castle..."
-                      className="w-full h-32 lg:h-40 p-4 border-2 rounded-xl text-base lg:text-lg font-medium resize-none"
-                      style={{backgroundColor: '#F9C74F', borderColor: '#2A9D8F', color: '#264653'}}
+                      className="w-full h-32 lg:h-40 p-4 border-2 rounded-xl text-base lg:text-lg font-medium resize-none bg-amber-100 border-teal-500 text-slate-800 placeholder:text-slate-600 focus:border-teal-600 focus:ring-2 focus:ring-teal-200 transition-all duration-200"
                     />
                   </div>
                   
@@ -367,8 +367,7 @@ export default function StoryGameApp() {
                       <button
                         onClick={handleAnalyze}
                         disabled={!inputText.trim()}
-                        className="w-full px-6 py-4 rounded-xl font-bold text-lg border-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                        style={{backgroundColor: '#2A9D8F', borderColor: '#264653', color: 'white'}}
+                        className="w-full px-6 py-4 rounded-xl font-bold text-lg border-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 bg-teal-600 border-slate-700 text-white hover:bg-teal-700 transition-all duration-200"
                       >
                         <FileText className="w-5 h-5" />
                         🎯 Find Words to Replace!
@@ -379,8 +378,7 @@ export default function StoryGameApp() {
                       <button
                         onClick={handleGenerateTemplate}
                         disabled={!inputText.trim()}
-                        className="w-full px-6 py-4 rounded-xl font-bold text-lg border-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                        style={{backgroundColor: '#F4A261', borderColor: '#264653', color: 'white'}}
+                        className="w-full px-6 py-4 rounded-xl font-bold text-lg border-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 bg-orange-500 border-slate-700 text-white hover:bg-orange-600 transition-all duration-200"
                       >
                         <FileText className="w-5 h-5" />
                         📋 Generate Template!
@@ -391,8 +389,7 @@ export default function StoryGameApp() {
                       <button
                         onClick={handleStartChatbot}
                         disabled={!inputText.trim()}
-                        className="w-full px-6 py-4 rounded-xl font-bold text-lg border-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                        style={{backgroundColor: '#E9C46A', borderColor: '#264653', color: '#264653'}}
+                        className="w-full px-6 py-4 rounded-xl font-bold text-lg border-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 bg-yellow-400 border-slate-700 text-slate-800 hover:bg-yellow-500 transition-all duration-200"
                       >
                         <Bot className="w-5 h-5" />
                         🤖 Start Chat Adventure!
