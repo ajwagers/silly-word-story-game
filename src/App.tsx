@@ -349,7 +349,6 @@ export default function StoryGameApp() {
               <div className="bg-white rounded-2xl shadow-xl p-4 lg:p-6 border border-gray-100">
                 <div className="space-y-4">
                   <div>
-                    <label htmlFor="story-input" className="block text-lg font-semibold mb-2 text-center lg:text-left" style={{color: '#264653'}}>
                     <label htmlFor="story-input" className="block text-lg font-semibold mb-2 text-center lg:text-left text-slate-700">
                       📝 Enter your story:
                     </label>
