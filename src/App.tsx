@@ -309,8 +309,6 @@ export default function StoryGameApp() {
               </p>
               <button className="bg-black text-white px-8 py-3 rounded font-semibold hover:bg-gray-800 transition-colors">
                 LETS GET STARTED!
-                |
-                V
               </button>
             </div>
           </div>
