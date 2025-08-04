@@ -202,7 +202,7 @@ export default function StoryGameApp() {
             {/* Logo */}
             <div className="flex items-center">
               <div className="bg-black text-white px-3 py-1 rounded font-bold text-lg tracking-tight">
-                📚 STORYBOP
+                📚 FILL-IN-FABLES
               </div>
             </div>
             
@@ -256,20 +256,81 @@ export default function StoryGameApp() {
       </nav>
 
       {/* Colorful Mosaic Header */}
-      <div className="bg-gray-100 text-center py-16 md:py-24 lg:py-32">
+      <div className="relative text-center py-16 md:py-24 lg:py-32 overflow-hidden">
+        {/* Colorful Mosaic Background */}
+        <div className="absolute inset-0 grid grid-cols-8 md:grid-cols-12 lg:grid-cols-16 gap-0">
+          {/* Row 1 */}
+          <div className="bg-green-400 aspect-square flex items-center justify-center text-2xl">🐢</div>
+          <div className="bg-teal-500 aspect-square flex items-center justify-center text-2xl">📡</div>
+          <div className="bg-red-400 aspect-square flex items-center justify-center text-2xl">🏢</div>
+          <div className="bg-yellow-400 aspect-square flex items-center justify-center text-2xl">🔔</div>
+          <div className="bg-pink-400 aspect-square flex items-center justify-center text-2xl">🌸</div>
+          <div className="bg-purple-400 aspect-square flex items-center justify-center text-2xl">🌲</div>
+          <div className="bg-blue-300 aspect-square flex items-center justify-center text-2xl">☁️</div>
+          <div className="bg-yellow-300 aspect-square flex items-center justify-center text-2xl">⚙️</div>
+          <div className="bg-green-400 aspect-square flex items-center justify-center text-2xl md:flex hidden">🐢</div>
+          <div className="bg-teal-500 aspect-square flex items-center justify-center text-2xl md:flex hidden">📡</div>
+          <div className="bg-red-400 aspect-square flex items-center justify-center text-2xl md:flex hidden">🏢</div>
+          <div className="bg-yellow-400 aspect-square flex items-center justify-center text-2xl md:flex hidden">🔔</div>
+          <div className="bg-pink-400 aspect-square flex items-center justify-center text-2xl lg:flex hidden">🌸</div>
+          <div className="bg-purple-400 aspect-square flex items-center justify-center text-2xl lg:flex hidden">🌲</div>
+          <div className="bg-blue-300 aspect-square flex items-center justify-center text-2xl lg:flex hidden">☁️</div>
+          <div className="bg-yellow-300 aspect-square flex items-center justify-center text-2xl lg:flex hidden">⚙️</div>
+          
+          {/* Row 2 */}
+          <div className="bg-orange-400 aspect-square flex items-center justify-center text-2xl">🏠</div>
+          <div className="bg-green-500 aspect-square flex items-center justify-center text-2xl">🌋</div>
+          <div className="bg-blue-400 aspect-square flex items-center justify-center text-2xl">👁️</div>
+          <div className="bg-red-300 aspect-square flex items-center justify-center text-2xl">🎸</div>
+          <div className="bg-yellow-500 aspect-square flex items-center justify-center text-2xl">💡</div>
+          <div className="bg-pink-300 aspect-square flex items-center justify-center text-2xl">🐙</div>
+          <div className="bg-purple-300 aspect-square flex items-center justify-center text-2xl">🎯</div>
+          <div className="bg-teal-400 aspect-square flex items-center justify-center text-2xl">🏠</div>
+          <div className="bg-orange-400 aspect-square flex items-center justify-center text-2xl md:flex hidden">🏠</div>
+          <div className="bg-green-500 aspect-square flex items-center justify-center text-2xl md:flex hidden">🌋</div>
+          <div className="bg-blue-400 aspect-square flex items-center justify-center text-2xl md:flex hidden">👁️</div>
+          <div className="bg-red-300 aspect-square flex items-center justify-center text-2xl md:flex hidden">🎸</div>
+          <div className="bg-yellow-500 aspect-square flex items-center justify-center text-2xl lg:flex hidden">💡</div>
+          <div className="bg-pink-300 aspect-square flex items-center justify-center text-2xl lg:flex hidden">🐙</div>
+          <div className="bg-purple-300 aspect-square flex items-center justify-center text-2xl lg:flex hidden">🎯</div>
+          <div className="bg-teal-400 aspect-square flex items-center justify-center text-2xl lg:flex hidden">🏠</div>
+          
+          {/* Row 3 */}
+          <div className="bg-blue-500 aspect-square flex items-center justify-center text-2xl">🌊</div>
+          <div className="bg-yellow-600 aspect-square flex items-center justify-center text-2xl">🌳</div>
+          <div className="bg-pink-500 aspect-square flex items-center justify-center text-2xl">🎭</div>
+          <div className="bg-green-300 aspect-square flex items-center justify-center text-2xl">🌿</div>
+          <div className="bg-orange-300 aspect-square flex items-center justify-center text-2xl">🦋</div>
+          <div className="bg-purple-500 aspect-square flex items-center justify-center text-2xl">🎨</div>
+          <div className="bg-red-500 aspect-square flex items-center justify-center text-2xl">🎪</div>
+          <div className="bg-teal-300 aspect-square flex items-center justify-center text-2xl">🐘</div>
+          <div className="bg-blue-500 aspect-square flex items-center justify-center text-2xl md:flex hidden">🌊</div>
+          <div className="bg-yellow-600 aspect-square flex items-center justify-center text-2xl md:flex hidden">🌳</div>
+          <div className="bg-pink-500 aspect-square flex items-center justify-center text-2xl md:flex hidden">🎭</div>
+          <div className="bg-green-300 aspect-square flex items-center justify-center text-2xl md:flex hidden">🌿</div>
+          <div className="bg-orange-300 aspect-square flex items-center justify-center text-2xl lg:flex hidden">🦋</div>
+          <div className="bg-purple-500 aspect-square flex items-center justify-center text-2xl lg:flex hidden">🎨</div>
+          <div className="bg-red-500 aspect-square flex items-center justify-center text-2xl lg:flex hidden">🎪</div>
+          <div className="bg-teal-300 aspect-square flex items-center justify-center text-2xl lg:flex hidden">🐘</div>
+        </div>
+        
+        {/* Text Content Box */}
+        <div className="relative z-10 max-w-4xl mx-auto px-4">
+          <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-8 md:p-12 shadow-2xl border border-gray-200">
           <div className="max-w-4xl mx-auto px-4">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 leading-tight">
-              CREATE SILLY STORIES,<br />
-              MAKE FRIENDS LAUGH,<br />
-              TELL ADVENTURES
+              EXPLORE HIDDEN<br />
+              WORLDS, MAKE<br />
+              ROBOTS, TELL STORIES
             </h1>
             <p className="text-lg md:text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
-              Transform any story into hilarious adventures with our award-winning word game
+              Play, create & learn with our award-winning apps
             </p>
             <button className="bg-black text-white px-8 py-3 rounded font-semibold hover:bg-gray-800 transition-colors">
-              START CREATING →
+              LEARN MORE →
             </button>
           </div>
+        </div>
       </div>
 
       {/* Main Content */}

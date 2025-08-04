@@ -11,8 +11,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
-        name: 'Silly Word Story Game',
-        short_name: 'Story Game',
+        name: 'Fill-in-Fables',
+        short_name: 'Fill-in-Fables',
         description: 'Create hilarious stories by replacing words with silly alternatives!',
         theme_color: '#2A9D8F',
         background_color: '#F9C74F',
