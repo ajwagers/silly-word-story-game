@@ -84,6 +84,7 @@ export default function StoryGameApp() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const storyRef = useRef<HTMLDivElement>(null);
+  const gameSetupRef = useRef<HTMLDivElement>(null);
   const mosaicTiles = generateMosaicTiles();
 
   const handleAnalyze = () => {
@@ -209,6 +210,13 @@ export default function StoryGameApp() {
     setMobileMenuOpen(false);
   };
 
+  const scrollToGameSetup = () => {
+    gameSetupRef.current?.scrollIntoView({ 
+      behavior: 'smooth',
+      block: 'start'
+    });
+    setMobileMenuOpen(false);
+  };
   const getStoryTitle = () => {
     switch (mode) {
       case GameMode.Interactive:
@@ -251,7 +259,10 @@ export default function StoryGameApp() {
               
               {/* Desktop Navigation */}
               <div className="hidden md:flex space-x-8">
-                <button className="text-gray-600 hover:text-gray-900 font-medium transition-colors">
+                <button 
+                  onClick={scrollToGameSetup}
+                  className="text-gray-600 hover:text-gray-900 font-medium transition-colors"
+                >
                   MAKE STORIES
                 </button>
                 <button className="text-gray-600 hover:text-gray-900 font-medium transition-colors">
@@ -278,7 +289,10 @@ export default function StoryGameApp() {
           {mobileMenuOpen && (
             <div className="hidden md:flex space-x-8">
                 <button className="text-gray-600 hover:text-gray-900 font-medium transition-colors">
-                  MAKE STORIES
+                <button 
+                  onClick={scrollToGameSetup}
+                  className="block w-full text-left text-gray-600 hover:text-gray-900 font-medium transition-colors"
+                >
                 </button>
                 <button className="text-gray-600 hover:text-gray-900 font-medium transition-colors">
                   ABOUT US
@@ -302,7 +316,10 @@ export default function StoryGameApp() {
               <p className="text-lg md:text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
                 Ever wanted to be the author of the silliest story ever? Pick some wacky words, fill in the blanks, /                   and watch your tale come to life! Every time you play, your story is different—giggles guaranteed.
               </p>
-              <button className="bg-black text-white px-8 py-3 rounded font-semibold hover:bg-gray-800 transition-colors">
+              <button 
+                onClick={scrollToGameSetup}
+                className="bg-black text-white px-8 py-3 rounded font-semibold hover:bg-gray-800 transition-colors"
+              >
                 LETS GET STARTED!
               </button>
             </div>
@@ -310,7 +327,7 @@ export default function StoryGameApp() {
         </section>
 
         {/* Game Setup Section - Always Visible */}
-        <section className="max-w-6xl mx-auto px-4 py-8">
+        <section ref={gameSetupRef} className="max-w-6xl mx-auto px-4 py-8">
           <div className="space-y-8">
             {/* Mode Selection */}
             <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg p-6 border">
