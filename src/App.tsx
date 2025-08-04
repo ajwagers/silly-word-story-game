@@ -317,18 +317,19 @@ export default function StoryGameApp() {
         {/* Text Content Box */}
         <div className="relative z-10 max-w-4xl mx-auto px-4">
           <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-8 md:p-12 shadow-2xl border border-gray-200">
-          <div className="max-w-4xl mx-auto px-4">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 leading-tight">
-              EXPLORE HIDDEN<br />
-              WORLDS, MAKE<br />
-              ROBOTS, TELL STORIES
-            </h1>
-            <p className="text-lg md:text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
-              Play, create & learn with our award-winning apps
-            </p>
-            <button className="bg-black text-white px-8 py-3 rounded font-semibold hover:bg-gray-800 transition-colors">
-              LEARN MORE →
-            </button>
+            <div className="max-w-4xl mx-auto px-4">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 leading-tight">
+                EXPLORE HIDDEN<br />
+                WORLDS, MAKE<br />
+                ROBOTS, TELL STORIES
+              </h1>
+              <p className="text-lg md:text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
+                Play, create & learn with our award-winning apps
+              </p>
+              <button className="bg-black text-white px-8 py-3 rounded font-semibold hover:bg-gray-800 transition-colors">
+                LEARN MORE →
+              </button>
+            </div>
           </div>
         </div>
       </div>
