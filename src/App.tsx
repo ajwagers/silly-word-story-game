@@ -85,6 +85,7 @@ export default function StoryGameApp() {
   
   const storyRef = useRef<HTMLDivElement>(null);
   const gameSetupRef = useRef<HTMLDivElement>(null);
+  const howToPlayRef = useRef<HTMLDivElement>(null);
   const mosaicTiles = generateMosaicTiles();
 
   const handleAnalyze = () => {
@@ -218,6 +219,14 @@ export default function StoryGameApp() {
     setMobileMenuOpen(false);
   };
   
+  const scrollToHowToPlay = () => {
+    howToPlayRef.current?.scrollIntoView({ 
+      behavior: 'smooth',
+      block: 'start'
+    });
+    setMobileMenuOpen(false);
+  };
+  
   const getStoryTitle = () => {
     switch (mode) {
       case GameMode.Interactive:
@@ -269,7 +278,10 @@ export default function StoryGameApp() {
                 <button className="text-gray-600 hover:text-gray-900 font-medium transition-colors">
                   ABOUT US
                 </button>
-                <button className="text-gray-600 hover:text-gray-900 font-medium transition-colors">
+                <button 
+                  onClick={scrollToHowToPlay}
+                  className="text-gray-600 hover:text-gray-900 font-medium transition-colors"
+                >
                   GET HELP
                 </button>
               </div>
@@ -298,7 +310,10 @@ export default function StoryGameApp() {
               <button className="block w-full text-left text-gray-600 hover:text-gray-900 font-medium transition-colors">
                 ABOUT US
               </button>
-              <button className="block w-full text-left text-gray-600 hover:text-gray-900 font-medium transition-colors">
+              <button 
+                onClick={scrollToHowToPlay}
+                className="block w-full text-left text-gray-600 hover:text-gray-900 font-medium transition-colors"
+              >
                 GET HELP
               </button>
             </div>
@@ -481,7 +496,7 @@ export default function StoryGameApp() {
         )}
 
         {/* How to Play Section - Always Visible */}
-        <section className="max-w-6xl mx-auto px-4 py-8">
+        <section ref={howToPlayRef} className="max-w-6xl mx-auto px-4 py-8">
           <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg p-6 border">
             <Accordion type="single" collapsible>
               <AccordionItem value="how">
