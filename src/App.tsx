@@ -238,7 +238,7 @@ export default function StoryGameApp() {
         {mosaicTiles.map((tile) => (
           <div 
             key={tile.id}
-            className={`${tile.color} aspect-square flex items-center justify-center text-2xl md:text-3xl lg:text-4xl`}
+            className={`${tile.color} aspect-square flex items-center justify-center text-lg md:text-xl lg:text-2xl`}
           >
             {tile.emoji}
           </div>
@@ -328,7 +328,7 @@ export default function StoryGameApp() {
         </section>
 
         {/* Game Setup Section - Always Visible */}
-        <section className="max-w-6xl mx-auto px-4 py-8">
+        <section ref={gameSetupRef} className="max-w-6xl mx-auto px-4 py-8">
           <div className="space-y-8">
             {/* Mode Selection */}
             <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg p-6 border">
