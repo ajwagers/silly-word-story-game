@@ -399,7 +399,7 @@ export default function StoryGameApp() {
             <div className="bg-white rounded-xl shadow-lg p-6 border">
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="story-input" className="block text-lg font-bold mb-3 text-gray-900">
+                  <label htmlFor="story-input" className="block text-lg font-bold mb-3 text-slate-800">
                     📝 Enter Your Story
                   </label>
                   <Textarea
