@@ -217,6 +217,7 @@ export default function StoryGameApp() {
     });
     setMobileMenuOpen(false);
   };
+  
   const getStoryTitle = () => {
     switch (mode) {
       case GameMode.Interactive:
@@ -287,20 +288,20 @@ export default function StoryGameApp() {
 
           {/* Mobile Navigation */}
           {mobileMenuOpen && (
-            <div className="hidden md:flex space-x-8">
-                <button className="text-gray-600 hover:text-gray-900 font-medium transition-colors">
-                <button 
-                  onClick={scrollToGameSetup}
-                  className="block w-full text-left text-gray-600 hover:text-gray-900 font-medium transition-colors"
-                >
-                </button>
-                <button className="text-gray-600 hover:text-gray-900 font-medium transition-colors">
-                  ABOUT US
-                </button>
-                <button className="text-gray-600 hover:text-gray-900 font-medium transition-colors">
-                  GET HELP
-                </button>
-              </div>
+            <div className="md:hidden bg-white/95 backdrop-blur-sm border-t px-4 py-4 space-y-2">
+              <button 
+                onClick={scrollToGameSetup}
+                className="block w-full text-left text-gray-600 hover:text-gray-900 font-medium transition-colors"
+              >
+                MAKE STORIES
+              </button>
+              <button className="block w-full text-left text-gray-600 hover:text-gray-900 font-medium transition-colors">
+                ABOUT US
+              </button>
+              <button className="block w-full text-left text-gray-600 hover:text-gray-900 font-medium transition-colors">
+                GET HELP
+              </button>
+            </div>
           )}
         </nav>
 
@@ -314,7 +315,7 @@ export default function StoryGameApp() {
                 just add YOUR words!
               </h1>
               <p className="text-lg md:text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
-                Ever wanted to be the author of the silliest story ever? Pick some wacky words, fill in the blanks, /                   and watch your tale come to life! Every time you play, your story is different—giggles guaranteed.
+                Ever wanted to be the author of the silliest story ever? Pick some wacky words, fill in the blanks, and watch your tale come to life! Every time you play, your story is different—giggles guaranteed.
               </p>
               <button 
                 onClick={scrollToGameSetup}
@@ -327,7 +328,7 @@ export default function StoryGameApp() {
         </section>
 
         {/* Game Setup Section - Always Visible */}
-        <section ref={gameSetupRef} className="max-w-6xl mx-auto px-4 py-8">
+        <section className="max-w-6xl mx-auto px-4 py-8">
           <div className="space-y-8">
             {/* Mode Selection */}
             <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg p-6 border">
