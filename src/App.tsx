@@ -238,7 +238,7 @@ export default function StoryGameApp() {
         {mosaicTiles.map((tile) => (
           <div 
             key={tile.id}
-            className={`${tile.color} aspect-square flex items-center justify-center text-lg md:text-xl lg:text-2xl`}
+            className={`${tile.color} aspect-square flex items-center justify-center text-2xl md:text-3xl lg:text-4xl`}
           >
             {tile.emoji}
           </div>
