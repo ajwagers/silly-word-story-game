@@ -256,68 +256,7 @@ export default function StoryGameApp() {
       </nav>
 
       {/* Colorful Mosaic Header */}
-      <div className="relative overflow-hidden bg-gray-200">
-        {/* Mosaic Pattern */}
-        <div className="absolute inset-0 grid grid-cols-12 md:grid-cols-20 lg:grid-cols-24 gap-0">
-          {/* Row 1 */}
-          <div className="bg-green-500 aspect-square flex items-center justify-center">🐢</div>
-          <div className="bg-teal-400 aspect-square flex items-center justify-center">📡</div>
-          <div className="bg-red-400 aspect-square flex items-center justify-center">🎮</div>
-          <div className="bg-yellow-400 aspect-square flex items-center justify-center">🌸</div>
-          <div className="bg-pink-300 aspect-square flex items-center justify-center">🎵</div>
-          <div className="bg-purple-300 aspect-square flex items-center justify-center">🌲</div>
-          <div className="bg-blue-300 aspect-square flex items-center justify-center">☁️</div>
-          <div className="bg-yellow-300 aspect-square flex items-center justify-center">⚙️</div>
-          <div className="bg-green-500 aspect-square flex items-center justify-center">🐢</div>
-          <div className="bg-teal-400 aspect-square flex items-center justify-center">📡</div>
-          <div className="bg-red-400 aspect-square flex items-center justify-center">🎮</div>
-          <div className="bg-yellow-400 aspect-square flex items-center justify-center">🌸</div>
-          
-          {/* Row 2 */}
-          <div className="bg-blue-600 aspect-square flex items-center justify-center">🏢</div>
-          <div className="bg-pink-200 aspect-square flex items-center justify-center">⚪</div>
-          <div className="bg-red-500 aspect-square flex items-center justify-center">🤖</div>
-          <div className="bg-teal-300 aspect-square flex items-center justify-center">🌿</div>
-          <div className="bg-black aspect-square flex items-center justify-center">🪐</div>
-          <div className="bg-gray-300 aspect-square"></div>
-          <div className="bg-gray-300 aspect-square"></div>
-          <div className="bg-gray-300 aspect-square"></div>
-          <div className="bg-blue-600 aspect-square flex items-center justify-center">🏢</div>
-          <div className="bg-pink-200 aspect-square flex items-center justify-center">⚪</div>
-          <div className="bg-red-500 aspect-square flex items-center justify-center">🤖</div>
-          <div className="bg-teal-300 aspect-square flex items-center justify-center">🌿</div>
-          
-          {/* Row 3 */}
-          <div className="bg-yellow-300 aspect-square flex items-center justify-center">⛰️</div>
-          <div className="bg-green-600 aspect-square flex items-center justify-center">🏠</div>
-          <div className="bg-gray-300 aspect-square"></div>
-          <div className="bg-gray-300 aspect-square"></div>
-          <div className="bg-gray-300 aspect-square"></div>
-          <div className="bg-gray-300 aspect-square"></div>
-          <div className="bg-gray-300 aspect-square"></div>
-          <div className="bg-gray-300 aspect-square"></div>
-          <div className="bg-yellow-300 aspect-square flex items-center justify-center">⛰️</div>
-          <div className="bg-green-600 aspect-square flex items-center justify-center">🏠</div>
-          <div className="bg-gray-300 aspect-square"></div>
-          <div className="bg-gray-300 aspect-square"></div>
-          
-          {/* Row 4 */}
-          <div className="bg-blue-400 aspect-square flex items-center justify-center">⚫</div>
-          <div className="bg-yellow-400 aspect-square flex items-center justify-center">💡</div>
-          <div className="bg-pink-400 aspect-square flex items-center justify-center">👁️</div>
-          <div className="bg-red-400 aspect-square flex items-center justify-center">🦆</div>
-          <div className="bg-gray-300 aspect-square"></div>
-          <div className="bg-gray-300 aspect-square"></div>
-          <div className="bg-gray-300 aspect-square"></div>
-          <div className="bg-gray-300 aspect-square"></div>
-          <div className="bg-blue-400 aspect-square flex items-center justify-center">⚫</div>
-          <div className="bg-yellow-400 aspect-square flex items-center justify-center">💡</div>
-          <div className="bg-pink-400 aspect-square flex items-center justify-center">👁️</div>
-          <div className="bg-red-400 aspect-square flex items-center justify-center">🦆</div>
-        </div>
-
-        {/* Hero Content */}
-        <div className="relative z-10 text-center py-16 md:py-24 lg:py-32">
+      <div className="bg-gray-100 text-center py-16 md:py-24 lg:py-32">
           <div className="max-w-4xl mx-auto px-4">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 leading-tight">
               CREATE SILLY STORIES,<br />
@@ -331,7 +270,6 @@ export default function StoryGameApp() {
               START CREATING →
             </button>
           </div>
-        </div>
       </div>
 
       {/* Main Content */}
