@@ -328,7 +328,7 @@ export default function StoryGameApp() {
         </section>
 
         {/* Game Setup Section - Always Visible */}
-        <section ref={gameSetupRef} className="max-w-6xl mx-auto px-4 py-8">
+        <section className="max-w-6xl mx-auto px-4 py-8">
           <div className="space-y-8">
             {/* Mode Selection */}
             <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg p-6 border">
