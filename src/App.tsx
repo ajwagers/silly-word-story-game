@@ -276,22 +276,17 @@ export default function StoryGameApp() {
 
           {/* Mobile Navigation */}
           {mobileMenuOpen && (
-            <div className="md:hidden bg-white/95 backdrop-blur-sm border-t">
-              <div className="px-2 pt-2 pb-3 space-y-1">
-                <button className="block px-3 py-2 text-gray-600 hover:text-gray-900 font-medium">
-                  GAMES
+            <div className="hidden md:flex space-x-8">
+                <button className="text-gray-600 hover:text-gray-900 font-medium transition-colors">
+                  MAKE STORIES
                 </button>
-                <button className="block px-3 py-2 text-gray-600 hover:text-gray-900 font-medium">
-                  STORIES
+                <button className="text-gray-600 hover:text-gray-900 font-medium transition-colors">
+                  ABOUT US
                 </button>
-                <button className="block px-3 py-2 text-gray-600 hover:text-gray-900 font-medium">
-                  ABOUT
-                </button>
-                <button className="block px-3 py-2 text-gray-600 hover:text-gray-900 font-medium">
-                  HELP
+                <button className="text-gray-600 hover:text-gray-900 font-medium transition-colors">
+                  GET HELP
                 </button>
               </div>
-            </div>
           )}
         </nav>
 
