@@ -300,8 +300,8 @@ export default function StoryGameApp() {
           <div className="max-w-4xl mx-auto px-4">
             <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-8 md:p-12 shadow-2xl border border-gray-200">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 leading-tight">
-                Make your own </br>
-                hilarious stories </br>
+                Make your own <br />
+                hilarious stories <br />
                 —just add your words!
               </h1>
               <p className="text-lg md:text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
