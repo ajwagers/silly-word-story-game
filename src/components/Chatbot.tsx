@@ -34,7 +34,7 @@ const Chatbot: React.FC<ChatbotProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg border">
+    <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg border">
       
       {/* Chat Header */}
       <div className="p-4 bg-green-600 rounded-t-xl">

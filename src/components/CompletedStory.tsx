@@ -32,7 +32,7 @@ const CompletedStory = forwardRef<HTMLDivElement, CompletedStoryProps>(({
   const content = isTemplate ? staticTemplate : completedStory;
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 border">
+    <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg p-6 border">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 space-y-4 md:space-y-0">
         <h2 className="text-2xl md:text-3xl font-bold text-center md:text-left text-gray-900">
           🎉 {storyTitle} 🎉

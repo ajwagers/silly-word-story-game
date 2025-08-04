@@ -28,7 +28,7 @@ const InteractiveModeForm: React.FC<InteractiveModeFormProps> = ({
   const allFieldsFilled = wordsToReplace.every(word => interactiveReplacements[word.id]?.trim());
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 border">
+    <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg p-6 border">
       <div className="mb-6">
         <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-2">
           🌟 {storyTitle} 🌟

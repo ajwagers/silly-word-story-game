@@ -42,6 +42,34 @@ export enum GameState {
   Chatting = 'chatting',
 }
 
+// Generate mosaic tiles data
+const generateMosaicTiles = () => {
+  const colors = [
+    'bg-green-400', 'bg-teal-500', 'bg-red-400', 'bg-yellow-400', 'bg-pink-400', 
+    'bg-purple-400', 'bg-blue-300', 'bg-yellow-300', 'bg-orange-400', 'bg-green-500',
+    'bg-blue-400', 'bg-red-300', 'bg-yellow-500', 'bg-pink-300', 'bg-purple-300',
+    'bg-teal-400', 'bg-blue-500', 'bg-yellow-600', 'bg-pink-500', 'bg-green-300',
+    'bg-orange-300', 'bg-purple-500', 'bg-red-500', 'bg-teal-300'
+  ];
+  
+  const emojis = [
+    '🐢', '📡', '🏢', '🔔', '🌸', '🌲', '☁️', '⚙️', '🏠', '🌋',
+    '👁️', '🎸', '💡', '🐙', '🎯', '🌊', '🌳', '🎭', '🌿', '🦋',
+    '🎨', '🎪', '🐘', '🚀', '🎮', '📚', '🎵', '🌟', '🎈', '🎁',
+    '🌺', '🦄', '🌈', '🎊', '🎉', '🎀', '🎂', '🍭', '🌙', '⭐'
+  ];
+  
+  const tiles = [];
+  for (let i = 0; i < 200; i++) {
+    tiles.push({
+      id: i,
+      color: colors[i % colors.length],
+      emoji: emojis[i % emojis.length]
+    });
+  }
+  return tiles;
+};
+
 export default function StoryGameApp() {
   const [gameState, setGameState] = useState<GameState>(GameState.Setup);
   const [mode, setMode] = useState<GameMode>(GameMode.Interactive);
@@ -56,6 +84,7 @@ export default function StoryGameApp() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const storyRef = useRef<HTMLDivElement>(null);
+  const mosaicTiles = generateMosaicTiles();
 
   const handleAnalyze = () => {
     const words = analyzeStory(inputText);
@@ -194,130 +223,85 @@ export default function StoryGameApp() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Navigation Header */}
-      <nav className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo */}
-            <div className="flex items-center">
-              <div className="bg-black text-white px-3 py-1 rounded font-bold text-lg tracking-tight">
-                📚 FILL-IN-FABLES
+    <div className="min-h-screen relative">
+      {/* Full-page mosaic background */}
+      <div className="fixed inset-0 grid grid-cols-8 md:grid-cols-12 lg:grid-cols-16 gap-0 z-0 overflow-hidden">
+        {mosaicTiles.map((tile) => (
+          <div 
+            key={tile.id}
+            className={`${tile.color} aspect-square flex items-center justify-center text-lg md:text-xl lg:text-2xl`}
+          >
+            {tile.emoji}
+          </div>
+        ))}
+      </div>
+
+      {/* Content overlay */}
+      <div className="relative z-10">
+        {/* Navigation Header */}
+        <nav className="bg-white/95 backdrop-blur-sm shadow-sm border-b sticky top-0 z-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center h-16">
+              {/* Logo */}
+              <div className="flex items-center">
+                <div className="bg-black text-white px-3 py-1 rounded font-bold text-lg tracking-tight">
+                  📚 FILL-IN-FABLES
+                </div>
+              </div>
+              
+              {/* Desktop Navigation */}
+              <div className="hidden md:flex space-x-8">
+                <button className="text-gray-600 hover:text-gray-900 font-medium transition-colors">
+                  GAMES
+                </button>
+                <button className="text-gray-600 hover:text-gray-900 font-medium transition-colors">
+                  STORIES
+                </button>
+                <button className="text-gray-600 hover:text-gray-900 font-medium transition-colors">
+                  ABOUT
+                </button>
+                <button className="text-gray-600 hover:text-gray-900 font-medium transition-colors">
+                  HELP
+                </button>
+              </div>
+
+              {/* Mobile menu button */}
+              <div className="md:hidden">
+                <button
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="text-gray-600 hover:text-gray-900"
+                >
+                  {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                </button>
               </div>
             </div>
-            
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex space-x-8">
-              <button className="text-gray-600 hover:text-gray-900 font-medium transition-colors">
-                GAMES
-              </button>
-              <button className="text-gray-600 hover:text-gray-900 font-medium transition-colors">
-                STORIES
-              </button>
-              <button className="text-gray-600 hover:text-gray-900 font-medium transition-colors">
-                ABOUT
-              </button>
-              <button className="text-gray-600 hover:text-gray-900 font-medium transition-colors">
-                HELP
-              </button>
-            </div>
-
-            {/* Mobile menu button */}
-            <div className="md:hidden">
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="text-gray-600 hover:text-gray-900"
-              >
-                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-              </button>
-            </div>
           </div>
-        </div>
 
-        {/* Mobile Navigation */}
-        {mobileMenuOpen && (
-          <div className="md:hidden bg-white border-t">
-            <div className="px-2 pt-2 pb-3 space-y-1">
-              <button className="block px-3 py-2 text-gray-600 hover:text-gray-900 font-medium">
-                GAMES
-              </button>
-              <button className="block px-3 py-2 text-gray-600 hover:text-gray-900 font-medium">
-                STORIES
-              </button>
-              <button className="block px-3 py-2 text-gray-600 hover:text-gray-900 font-medium">
-                ABOUT
-              </button>
-              <button className="block px-3 py-2 text-gray-600 hover:text-gray-900 font-medium">
-                HELP
-              </button>
+          {/* Mobile Navigation */}
+          {mobileMenuOpen && (
+            <div className="md:hidden bg-white/95 backdrop-blur-sm border-t">
+              <div className="px-2 pt-2 pb-3 space-y-1">
+                <button className="block px-3 py-2 text-gray-600 hover:text-gray-900 font-medium">
+                  GAMES
+                </button>
+                <button className="block px-3 py-2 text-gray-600 hover:text-gray-900 font-medium">
+                  STORIES
+                </button>
+                <button className="block px-3 py-2 text-gray-600 hover:text-gray-900 font-medium">
+                  ABOUT
+                </button>
+                <button className="block px-3 py-2 text-gray-600 hover:text-gray-900 font-medium">
+                  HELP
+                </button>
+              </div>
             </div>
-          </div>
-        )}
-      </nav>
+          )}
+        </nav>
 
-      {/* Colorful Mosaic Header */}
-      <div className="relative text-center py-16 md:py-24 lg:py-32 overflow-hidden">
-        {/* Colorful Mosaic Background */}
-        <div className="absolute inset-0 grid grid-cols-8 md:grid-cols-12 lg:grid-cols-16 gap-0">
-          {/* Row 1 */}
-          <div className="bg-green-400 aspect-square flex items-center justify-center text-2xl">🐢</div>
-          <div className="bg-teal-500 aspect-square flex items-center justify-center text-2xl">📡</div>
-          <div className="bg-red-400 aspect-square flex items-center justify-center text-2xl">🏢</div>
-          <div className="bg-yellow-400 aspect-square flex items-center justify-center text-2xl">🔔</div>
-          <div className="bg-pink-400 aspect-square flex items-center justify-center text-2xl">🌸</div>
-          <div className="bg-purple-400 aspect-square flex items-center justify-center text-2xl">🌲</div>
-          <div className="bg-blue-300 aspect-square flex items-center justify-center text-2xl">☁️</div>
-          <div className="bg-yellow-300 aspect-square flex items-center justify-center text-2xl">⚙️</div>
-          <div className="bg-green-400 aspect-square flex items-center justify-center text-2xl md:flex hidden">🐢</div>
-          <div className="bg-teal-500 aspect-square flex items-center justify-center text-2xl md:flex hidden">📡</div>
-          <div className="bg-red-400 aspect-square flex items-center justify-center text-2xl md:flex hidden">🏢</div>
-          <div className="bg-yellow-400 aspect-square flex items-center justify-center text-2xl md:flex hidden">🔔</div>
-          <div className="bg-pink-400 aspect-square flex items-center justify-center text-2xl lg:flex hidden">🌸</div>
-          <div className="bg-purple-400 aspect-square flex items-center justify-center text-2xl lg:flex hidden">🌲</div>
-          <div className="bg-blue-300 aspect-square flex items-center justify-center text-2xl lg:flex hidden">☁️</div>
-          <div className="bg-yellow-300 aspect-square flex items-center justify-center text-2xl lg:flex hidden">⚙️</div>
-          
-          {/* Row 2 */}
-          <div className="bg-orange-400 aspect-square flex items-center justify-center text-2xl">🏠</div>
-          <div className="bg-green-500 aspect-square flex items-center justify-center text-2xl">🌋</div>
-          <div className="bg-blue-400 aspect-square flex items-center justify-center text-2xl">👁️</div>
-          <div className="bg-red-300 aspect-square flex items-center justify-center text-2xl">🎸</div>
-          <div className="bg-yellow-500 aspect-square flex items-center justify-center text-2xl">💡</div>
-          <div className="bg-pink-300 aspect-square flex items-center justify-center text-2xl">🐙</div>
-          <div className="bg-purple-300 aspect-square flex items-center justify-center text-2xl">🎯</div>
-          <div className="bg-teal-400 aspect-square flex items-center justify-center text-2xl">🏠</div>
-          <div className="bg-orange-400 aspect-square flex items-center justify-center text-2xl md:flex hidden">🏠</div>
-          <div className="bg-green-500 aspect-square flex items-center justify-center text-2xl md:flex hidden">🌋</div>
-          <div className="bg-blue-400 aspect-square flex items-center justify-center text-2xl md:flex hidden">👁️</div>
-          <div className="bg-red-300 aspect-square flex items-center justify-center text-2xl md:flex hidden">🎸</div>
-          <div className="bg-yellow-500 aspect-square flex items-center justify-center text-2xl lg:flex hidden">💡</div>
-          <div className="bg-pink-300 aspect-square flex items-center justify-center text-2xl lg:flex hidden">🐙</div>
-          <div className="bg-purple-300 aspect-square flex items-center justify-center text-2xl lg:flex hidden">🎯</div>
-          <div className="bg-teal-400 aspect-square flex items-center justify-center text-2xl lg:flex hidden">🏠</div>
-          
-          {/* Row 3 */}
-          <div className="bg-blue-500 aspect-square flex items-center justify-center text-2xl">🌊</div>
-          <div className="bg-yellow-600 aspect-square flex items-center justify-center text-2xl">🌳</div>
-          <div className="bg-pink-500 aspect-square flex items-center justify-center text-2xl">🎭</div>
-          <div className="bg-green-300 aspect-square flex items-center justify-center text-2xl">🌿</div>
-          <div className="bg-orange-300 aspect-square flex items-center justify-center text-2xl">🦋</div>
-          <div className="bg-purple-500 aspect-square flex items-center justify-center text-2xl">🎨</div>
-          <div className="bg-red-500 aspect-square flex items-center justify-center text-2xl">🎪</div>
-          <div className="bg-teal-300 aspect-square flex items-center justify-center text-2xl">🐘</div>
-          <div className="bg-blue-500 aspect-square flex items-center justify-center text-2xl md:flex hidden">🌊</div>
-          <div className="bg-yellow-600 aspect-square flex items-center justify-center text-2xl md:flex hidden">🌳</div>
-          <div className="bg-pink-500 aspect-square flex items-center justify-center text-2xl md:flex hidden">🎭</div>
-          <div className="bg-green-300 aspect-square flex items-center justify-center text-2xl md:flex hidden">🌿</div>
-          <div className="bg-orange-300 aspect-square flex items-center justify-center text-2xl lg:flex hidden">🦋</div>
-          <div className="bg-purple-500 aspect-square flex items-center justify-center text-2xl lg:flex hidden">🎨</div>
-          <div className="bg-red-500 aspect-square flex items-center justify-center text-2xl lg:flex hidden">🎪</div>
-          <div className="bg-teal-300 aspect-square flex items-center justify-center text-2xl lg:flex hidden">🐘</div>
-        </div>
-        
-        {/* Text Content Box */}
-        <div className="relative z-10 max-w-4xl mx-auto px-4">
-          <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-8 md:p-12 shadow-2xl border border-gray-200">
-            <div className="max-w-4xl mx-auto px-4">
+        {/* Hero Section */}
+        <section className="text-center py-16 md:py-24 lg:py-32">
+          <div className="max-w-4xl mx-auto px-4">
+            <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-8 md:p-12 shadow-2xl border border-gray-200">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 leading-tight">
                 EXPLORE HIDDEN<br />
                 WORLDS, MAKE<br />
@@ -331,15 +315,13 @@ export default function StoryGameApp() {
               </button>
             </div>
           </div>
-        </div>
-      </div>
+        </section>
 
-      {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 py-12">
-        {gameState === GameState.Setup && (
+        {/* Game Setup Section - Always Visible */}
+        <section className="max-w-6xl mx-auto px-4 py-8">
           <div className="space-y-8">
             {/* Mode Selection */}
-            <div className="bg-white rounded-xl shadow-lg p-6 border">
+            <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg p-6 border">
               <h3 className="text-xl font-bold text-gray-900 mb-6 text-center">Choose Your Adventure</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <button
@@ -396,7 +378,7 @@ export default function StoryGameApp() {
             </div>
 
             {/* Story Input */}
-            <div className="bg-white rounded-xl shadow-lg p-6 border">
+            <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg p-6 border">
               <div className="space-y-4">
                 <div>
                   <label htmlFor="story-input" className="block text-lg font-bold mb-3 text-slate-800">
@@ -448,44 +430,49 @@ export default function StoryGameApp() {
               </div>
             </div>
           </div>
+        </section>
+
+        {/* Game Content Section */}
+        {(gameState === GameState.Playing || gameState === GameState.Chatting || gameState === GameState.Completed) && (
+          <section className="max-w-6xl mx-auto px-4 py-8">
+            {gameState === GameState.Playing && mode === GameMode.Interactive && (
+              <InteractiveModeForm
+                storyTitle={getStoryTitle()}
+                wordsToReplace={wordsToReplace}
+                interactiveReplacements={interactiveReplacements}
+                onReplacementChange={handleReplacementChange}
+                onGenerateStory={handleGenerateStory}
+              />
+            )}
+
+            {gameState === GameState.Chatting && mode === GameMode.Chatbot && (
+              <Chatbot
+                chatMessages={chatMessages}
+                userResponse={userResponse}
+                setUserResponse={setUserResponse}
+                onSendMessage={handleSendMessage}
+              />
+            )}
+
+            {gameState === GameState.Completed && (
+              <CompletedStory
+                ref={storyRef}
+                storyTitle={getStoryTitle()}
+                completedStory={completedStory}
+                staticTemplate={staticTemplate}
+                wordsToReplace={wordsToReplace}
+                displayMode={mode === GameMode.Static ? DisplayMode.Template : DisplayMode.Story}
+                onDownloadPDF={handleDownloadPDF}
+                onShareStory={handleShareStory}
+                onReset={handleReset}
+              />
+            )}
+          </section>
         )}
 
-        {gameState === GameState.Playing && mode === GameMode.Interactive && (
-          <InteractiveModeForm
-            storyTitle={getStoryTitle()}
-            wordsToReplace={wordsToReplace}
-            interactiveReplacements={interactiveReplacements}
-            onReplacementChange={handleReplacementChange}
-            onGenerateStory={handleGenerateStory}
-          />
-        )}
-
-        {gameState === GameState.Chatting && mode === GameMode.Chatbot && (
-          <Chatbot
-            chatMessages={chatMessages}
-            userResponse={userResponse}
-            setUserResponse={setUserResponse}
-            onSendMessage={handleSendMessage}
-          />
-        )}
-
-        {gameState === GameState.Completed && (
-          <CompletedStory
-            ref={storyRef}
-            storyTitle={getStoryTitle()}
-            completedStory={completedStory}
-            staticTemplate={staticTemplate}
-            wordsToReplace={wordsToReplace}
-            displayMode={mode === GameMode.Static ? DisplayMode.Template : DisplayMode.Story}
-            onDownloadPDF={handleDownloadPDF}
-            onShareStory={handleShareStory}
-            onReset={handleReset}
-          />
-        )}
-
-        {/* How to Play Section */}
-        <section className="mt-16">
-          <div className="bg-white rounded-xl shadow-lg p-6 border">
+        {/* How to Play Section - Always Visible */}
+        <section className="max-w-6xl mx-auto px-4 py-8">
+          <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg p-6 border">
             <Accordion type="single" collapsible>
               <AccordionItem value="how">
                 <AccordionTrigger className="text-xl font-bold text-gray-900 hover:text-gray-700">
@@ -505,57 +492,28 @@ export default function StoryGameApp() {
           </div>
         </section>
 
-        {/* Action Buttons for Completed State */}
-        {gameState === GameState.Completed && (
-          <div className="flex flex-wrap gap-4 mt-8 justify-center">
-            <Button 
-              onClick={handleDownloadPDF}
-              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 text-lg rounded-xl shadow-lg"
-            >
-              <Download className="w-5 h-5 mr-2" /> 
-              Download PDF
-            </Button>
-            {mode !== GameMode.Static && (
-              <Button 
-                onClick={handleShareStory}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 text-lg rounded-xl shadow-lg"
-              >
-                <Share2 className="w-5 h-5 mr-2" /> 
-                Share Story
-              </Button>
-            )}
-            <Button 
-              onClick={handleReset}
-              className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 text-lg rounded-xl shadow-lg"
-            >
-              <RefreshCw className="w-5 h-5 mr-2" /> 
-              New Game
-            </Button>
+        {/* Newsletter Section - Always Visible */}
+        <section className="bg-blue-200/95 backdrop-blur-sm py-16">
+          <div className="max-w-4xl mx-auto text-center px-4">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              GET OUR OCCASIONAL NEWSLETTER
+            </h2>
+            <p className="text-lg text-gray-700 mb-8">
+              Discover wonderful story ideas and creative writing tips.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+              <input
+                type="email"
+                placeholder="Email address"
+                className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+              />
+              <button className="bg-black text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors">
+                SIGN UP
+              </button>
+            </div>
           </div>
-        )}
-      </main>
-
-      {/* Newsletter Section */}
-      <section className="bg-blue-200 py-16">
-        <div className="max-w-4xl mx-auto text-center px-4">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            GET OUR OCCASIONAL NEWSLETTER
-          </h2>
-          <p className="text-lg text-gray-700 mb-8">
-            Discover wonderful story ideas and creative writing tips.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-            <input
-              type="email"
-              placeholder="Email address"
-              className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
-            />
-            <button className="bg-black text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors">
-              SIGN UP
-            </button>
-          </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </div>
   );
 }
