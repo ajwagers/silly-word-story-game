@@ -308,7 +308,9 @@ export default function StoryGameApp() {
                 Ever wanted to be the author of the silliest story ever? Pick some wacky words, fill in the blanks, /                   and watch your tale come to life! Every time you play, your story is different—giggles guaranteed.
               </p>
               <button className="bg-black text-white px-8 py-3 rounded font-semibold hover:bg-gray-800 transition-colors">
-                LEARN MORE →
+                LETS GET STARTED!
+                |
+                V
               </button>
             </div>
           </div>
