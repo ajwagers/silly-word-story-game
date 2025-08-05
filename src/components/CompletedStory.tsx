@@ -33,28 +33,6 @@ const CompletedStory = forwardRef<HTMLDivElement, CompletedStoryProps>(({
   const isTemplate = displayMode === DisplayMode.Template;
   const content = isTemplate ? staticTemplate : completedStory;
 
-  // Function to highlight replaced words in the story
-  const highlightReplacedWords = (story: string) => {
-    if (!story || isTemplate) return story;
-    
-    let highlightedStory = story;
-    
-    // We need to process replacements in reverse order (highest position first)
-    // to maintain accurate positions as we modify the string
-    const sortedWords = [...wordsToReplace].sort((a, b) => b.position - a.position);
-    
-    sortedWords.forEach(word => {
-      const replacement = interactiveReplacements[word.id];
-      if (replacement) {
-        // Find the exact word at the position and replace it with highlighted version
-        const beforeWord = highlightedStory.substring(0, word.position);
-        const afterWord = highlightedStory.substring(word.position + word.original.length);
-        highlightedStory = beforeWord + `<span class="font-bold underline text-blue-600">${replacement}</span>` + afterWord;
-      }
-    });
-    
-    return highlightedStory;
-  };
   return (
     <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg p-6 border">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 space-y-4 md:space-y-0">
@@ -126,7 +104,7 @@ const CompletedStory = forwardRef<HTMLDivElement, CompletedStoryProps>(({
             <h4 className="font-bold mb-4 text-xl md:text-2xl text-center text-gray-900">🎭 Your Hilarious Story! 🎭</h4>
             <div 
               className="text-lg md:text-xl leading-relaxed font-medium text-center text-gray-900"
-              dangerouslySetInnerHTML={{ __html: highlightReplacedWords(content || '') }}
+              dangerouslySetInnerHTML={{ __html: content || '' }}
             />
           </div>
         </div>

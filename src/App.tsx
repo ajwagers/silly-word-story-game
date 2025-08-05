@@ -175,7 +175,8 @@ export default function StoryGameApp() {
     sortedWords.forEach(word => {
       const replacement = interactiveReplacements[word.id];
       if (replacement) {
-        story = story.substring(0, word.position) + replacement + story.substring(word.position + word.original.length);
+        const highlightedReplacement = `<span class="font-bold underline text-blue-600">${replacement}</span>`;
+        story = story.substring(0, word.position) + highlightedReplacement + story.substring(word.position + word.original.length);
       }
     });
     
@@ -223,7 +224,8 @@ export default function StoryGameApp() {
       sortedWords.forEach(word => {
         const replacement = updatedReplacements[word.id];
         if (replacement) {
-          story = story.substring(0, word.position) + replacement + story.substring(word.position + word.original.length);
+          const highlightedReplacement = `<span class="font-bold underline text-blue-600">${replacement}</span>`;
+          story = story.substring(0, word.position) + highlightedReplacement + story.substring(word.position + word.original.length);
         }
       });
       
