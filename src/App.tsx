@@ -28,6 +28,7 @@ import InteractiveModeForm, { WordToReplace } from "./components/InteractiveMode
 import CompletedStory, { DisplayMode } from "./components/CompletedStory";
 import Chatbot, { ChatMessage } from "./components/Chatbot";
 import { analyzeStory, generateStoryTemplate, downloadPDF, shareStory } from "./utils/storyUtils";
+import { getRandomStoryFromDb } from "./utils/dbUtils";
 
 export enum GameMode {
   Interactive = 'interactive',
@@ -82,6 +83,7 @@ export default function StoryGameApp() {
   const [userResponse, setUserResponse] = useState("");
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isLoadingStory, setIsLoadingStory] = useState(false);
   
   const storyRef = useRef<HTMLDivElement>(null);
   const gameSetupRef = useRef<HTMLDivElement>(null);
@@ -186,6 +188,19 @@ export default function StoryGameApp() {
 
     setChatMessages(prev => [...prev, userMessage, botResponse]);
     setUserResponse("");
+  };
+
+  const handleLoadRandomStory = async () => {
+    setIsLoadingStory(true);
+    try {
+      const randomStory = await getRandomStoryFromDb();
+      setInputText(randomStory);
+    } catch (error) {
+      console.error('Error loading random story:', error);
+      alert('Sorry, could not load a random story. Please try again or enter your own story.');
+    } finally {
+      setIsLoadingStory(false);
+    }
   };
 
   const handleDownloadPDF = () => {
@@ -416,6 +431,26 @@ export default function StoryGameApp() {
                     placeholder="Once upon a time, there was a brave knight who lived in a magical castle..."
                     className="w-full h-32 md:h-40 p-4 border-2 rounded-xl text-base font-medium resize-none bg-gray-50 border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
                   />
+                </div>
+                
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button
+                    onClick={handleLoadRandomStory}
+                    disabled={isLoadingStory}
+                    className="flex-1 px-4 py-3 rounded-xl font-bold text-base border-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 bg-purple-600 border-purple-600 text-white hover:bg-purple-700 hover:border-purple-700 transition-all duration-200"
+                  >
+                    <Sparkles className="w-5 h-5" />
+                    {isLoadingStory ? 'Loading...' : 'Load Random Story'}
+                  </button>
+                  
+                  {inputText.trim() && (
+                    <button
+                      onClick={() => setInputText('')}
+                      className="px-4 py-3 rounded-xl font-bold text-base border-2 bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200 hover:border-gray-400 transition-all duration-200"
+                    >
+                      Clear
+                    </button>
+                  )}
                 </div>
                 
                 <div className="pt-4">
