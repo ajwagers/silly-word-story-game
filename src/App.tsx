@@ -556,10 +556,10 @@ export default function StoryGameApp() {
         <section className="bg-blue-200/95 backdrop-blur-sm py-16">
           <div className="max-w-4xl mx-auto text-center px-4">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              GET OUR OCCASIONAL NEWSLETTER
+              SIGN UP FOR OUR IRREGULAR NEWSLETTER (we don't send it out very often)
             </h2>
             <p className="text-lg text-gray-700 mb-8">
-              Discover wonderful story ideas and creative writing tips.
+              Keep up on what is new, discover new story ideas, and collect creative writing tips.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
               <input
