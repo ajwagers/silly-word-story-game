@@ -79,6 +79,8 @@ export default function StoryGameApp() {
   const [interactiveReplacements, setInteractiveReplacements] = useState<{ [key: string]: string }>({});
   const [completedStory, setCompletedStory] = useState("");
   const [staticTemplate, setStaticTemplate] = useState("");
+  const [hiddenStory, setHiddenStory] = useState("");
+  const [isUsingRandomStory, setIsUsingRandomStory] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [userResponse, setUserResponse] = useState("");
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
@@ -91,21 +93,24 @@ export default function StoryGameApp() {
   const mosaicTiles = generateMosaicTiles();
 
   const handleAnalyze = () => {
-    const words = analyzeStory(inputText);
+    const storyToAnalyze = isUsingRandomStory ? hiddenStory : inputText;
+    const words = analyzeStory(storyToAnalyze);
     setWordsToReplace(words);
     setGameState(GameState.Playing);
   };
 
   const handleGenerateTemplate = () => {
-    const words = analyzeStory(inputText);
-    const template = generateStoryTemplate(inputText, words);
+    const storyToAnalyze = isUsingRandomStory ? hiddenStory : inputText;
+    const words = analyzeStory(storyToAnalyze);
+    const template = generateStoryTemplate(storyToAnalyze, words);
     setWordsToReplace(words);
     setStaticTemplate(template);
     setGameState(GameState.Completed);
   };
 
   const handleStartChatbot = () => {
-    const words = analyzeStory(inputText);
+    const storyToAnalyze = isUsingRandomStory ? hiddenStory : inputText;
+    const words = analyzeStory(storyToAnalyze);
     setWordsToReplace(words);
     setCurrentWordIndex(0);
     
@@ -127,7 +132,7 @@ export default function StoryGameApp() {
   };
 
   const handleGenerateStory = () => {
-    let story = inputText;
+    let story = isUsingRandomStory ? hiddenStory : inputText;
     const sortedWords = [...wordsToReplace].sort((a, b) => b.position - a.position);
     
     sortedWords.forEach(word => {
@@ -167,7 +172,7 @@ export default function StoryGameApp() {
       };
       setCurrentWordIndex(nextIndex);
     } else {
-      let story = inputText;
+      let story = isUsingRandomStory ? hiddenStory : inputText;
       const sortedWords = [...wordsToReplace].sort((a, b) => b.position - a.position);
       
       sortedWords.forEach(word => {
@@ -194,7 +199,9 @@ export default function StoryGameApp() {
     setIsLoadingStory(true);
     try {
       const randomStory = await getRandomStoryFromDb();
-      setInputText(randomStory);
+      setHiddenStory(randomStory);
+      setIsUsingRandomStory(true);
+      setInputText(""); // Clear the visible input
     } catch (error) {
       console.error('Error loading random story:', error);
       alert('Sorry, could not load a random story. Please try again or enter your own story.');
@@ -216,6 +223,8 @@ export default function StoryGameApp() {
   const handleReset = () => {
     setGameState(GameState.Setup);
     setInputText("");
+    setHiddenStory("");
+    setIsUsingRandomStory(false);
     setWordsToReplace([]);
     setInteractiveReplacements({});
     setCompletedStory("");
@@ -428,7 +437,8 @@ export default function StoryGameApp() {
                     id="story-input"
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
-                    placeholder="Once upon a time, there was a brave knight who lived in a magical castle..."
+                    placeholder={isUsingRandomStory ? "🎲 Random story loaded! Choose your game mode to start playing..." : "Once upon a time, there was a brave knight who lived in a magical castle..."}
+                    disabled={isUsingRandomStory}
                     className="w-full h-32 md:h-40 p-4 border-2 rounded-xl text-base font-medium resize-none bg-gray-50 border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
                   />
                 </div>
@@ -445,10 +455,26 @@ export default function StoryGameApp() {
                   
                   {inputText.trim() && (
                     <button
-                      onClick={() => setInputText('')}
+                      onClick={() => {
+                        setInputText('');
+                        setHiddenStory('');
+                        setIsUsingRandomStory(false);
+                      }}
                       className="px-4 py-3 rounded-xl font-bold text-base border-2 bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200 hover:border-gray-400 transition-all duration-200"
                     >
                       Clear
+                    </button>
+                  )}
+                  
+                  {isUsingRandomStory && (
+                    <button
+                      onClick={() => {
+                        setHiddenStory('');
+                        setIsUsingRandomStory(false);
+                      }}
+                      className="px-4 py-3 rounded-xl font-bold text-base border-2 bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200 hover:border-gray-400 transition-all duration-200"
+                    >
+                      Clear Random Story
                     </button>
                   )}
                 </div>
@@ -457,7 +483,7 @@ export default function StoryGameApp() {
                   {mode === GameMode.Interactive && (
                     <button
                       onClick={handleAnalyze}
-                      disabled={!inputText.trim()}
+                      disabled={!inputText.trim() && !isUsingRandomStory}
                       className="w-full px-6 py-4 rounded-xl font-bold text-lg border-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 bg-blue-600 border-blue-600 text-white hover:bg-blue-700 hover:border-blue-700 transition-all duration-200"
                     >
                       <FileText className="w-5 h-5" />
@@ -468,7 +494,7 @@ export default function StoryGameApp() {
                   {mode === GameMode.Static && (
                     <button
                       onClick={handleGenerateTemplate}
-                      disabled={!inputText.trim()}
+                      disabled={!inputText.trim() && !isUsingRandomStory}
                       className="w-full px-6 py-4 rounded-xl font-bold text-lg border-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 bg-orange-600 border-orange-600 text-white hover:bg-orange-700 hover:border-orange-700 transition-all duration-200"
                     >
                       <FileText className="w-5 h-5" />
@@ -479,7 +505,7 @@ export default function StoryGameApp() {
                   {mode === GameMode.Chatbot && (
                     <button
                       onClick={handleStartChatbot}
-                      disabled={!inputText.trim()}
+                      disabled={!inputText.trim() && !isUsingRandomStory}
                       className="w-full px-6 py-4 rounded-xl font-bold text-lg border-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 bg-green-600 border-green-600 text-white hover:bg-green-700 hover:border-green-700 transition-all duration-200"
                     >
                       <Bot className="w-5 h-5" />
