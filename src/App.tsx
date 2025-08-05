@@ -30,6 +30,34 @@ import Chatbot, { ChatMessage } from "./components/Chatbot";
 import { analyzeStory, generateStoryTemplate, downloadPDF, shareStory } from "./utils/storyUtils";
 import { getRandomStoryFromDb } from "./utils/dbUtils";
 
+// Generate mosaic tiles data
+const colors = [
+  'bg-green-400', 'bg-teal-500', 'bg-red-400', 'bg-yellow-400', 'bg-pink-400', 
+  'bg-purple-400', 'bg-blue-300', 'bg-yellow-300', 'bg-orange-400', 'bg-green-500',
+  'bg-blue-400', 'bg-red-300', 'bg-yellow-500', 'bg-pink-300', 'bg-purple-300',
+  'bg-teal-400', 'bg-blue-500', 'bg-yellow-600', 'bg-pink-500', 'bg-green-300',
+  'bg-orange-300', 'bg-purple-500', 'bg-red-500', 'bg-teal-300'
+];
+
+const emojis = [
+  '🐢', '📡', '🏢', '🔔', '🌸', '🌲', '☁️', '⚙️', '🏠', '🌋',
+  '👁️', '🎸', '💡', '🐙', '🎯', '🌊', '🌳', '🎭', '🌿', '🦋',
+  '🎨', '🎪', '🐘', '🚀', '🎮', '📚', '🎵', '🌟', '🎈', '🎁',
+  '🌺', '🦄', '🌈', '🎊', '🎉', '🎀', '🎂', '🍭', '🌙', '⭐'
+];
+
+const generateMosaicTiles = () => {
+  const tiles = [];
+  for (let i = 0; i < 200; i++) {
+    tiles.push({
+      id: i,
+      color: colors[i % colors.length],
+      emoji: emojis[i % emojis.length]
+    });
+  }
+  return tiles;
+};
+
 export enum GameMode {
   Interactive = 'interactive',
   Static = 'static',
@@ -42,34 +70,6 @@ export enum GameState {
   Completed = 'completed',
   Chatting = 'chatting',
 }
-
-// Generate mosaic tiles data
-const generateMosaicTiles = () => {
-  const colors = [
-    'bg-green-400', 'bg-teal-500', 'bg-red-400', 'bg-yellow-400', 'bg-pink-400', 
-    'bg-purple-400', 'bg-blue-300', 'bg-yellow-300', 'bg-orange-400', 'bg-green-500',
-    'bg-blue-400', 'bg-red-300', 'bg-yellow-500', 'bg-pink-300', 'bg-purple-300',
-    'bg-teal-400', 'bg-blue-500', 'bg-yellow-600', 'bg-pink-500', 'bg-green-300',
-    'bg-orange-300', 'bg-purple-500', 'bg-red-500', 'bg-teal-300'
-  ];
-  
-  const emojis = [
-    '🐢', '📡', '🏢', '🔔', '🌸', '🌲', '☁️', '⚙️', '🏠', '🌋',
-    '👁️', '🎸', '💡', '🐙', '🎯', '🌊', '🌳', '🎭', '🌿', '🦋',
-    '🎨', '🎪', '🐘', '🚀', '🎮', '📚', '🎵', '🌟', '🎈', '🎁',
-    '🌺', '🦄', '🌈', '🎊', '🎉', '🎀', '🎂', '🍭', '🌙', '⭐'
-  ];
-  
-  const tiles = [];
-  for (let i = 0; i < 200; i++) {
-    tiles.push({
-      id: i,
-      color: colors[i % colors.length],
-      emoji: emojis[i % emojis.length]
-    });
-  }
-  return tiles;
-};
 
 export default function StoryGameApp() {
   const [gameState, setGameState] = useState<GameState>(GameState.Setup);
@@ -86,11 +86,48 @@ export default function StoryGameApp() {
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoadingStory, setIsLoadingStory] = useState(false);
+  const [mosaicTiles, setMosaicTiles] = useState(() => generateMosaicTiles());
+  const [animatingTileId, setAnimatingTileId] = useState<number | null>(null);
   
   const storyRef = useRef<HTMLDivElement>(null);
   const gameSetupRef = useRef<HTMLDivElement>(null);
   const howToPlayRef = useRef<HTMLDivElement>(null);
-  const mosaicTiles = generateMosaicTiles();
+
+  // Background tile animation effect
+  useEffect(() => {
+    const animationInterval = setInterval(() => {
+      // Select a random tile to animate
+      const randomIndex = Math.floor(Math.random() * mosaicTiles.length);
+      const tileToAnimate = mosaicTiles[randomIndex];
+      
+      // Start the animation
+      setAnimatingTileId(tileToAnimate.id);
+      
+      // Change the tile's content halfway through the animation
+      setTimeout(() => {
+        setMosaicTiles(prevTiles => 
+          prevTiles.map(tile => 
+            tile.id === tileToAnimate.id
+              ? {
+                  ...tile,
+                  color: colors[Math.floor(Math.random() * colors.length)],
+                  emoji: emojis[Math.floor(Math.random() * emojis.length)]
+                }
+              : tile
+          )
+        );
+      }, 250); // Halfway through the 500ms animation
+      
+      // End the animation
+      setTimeout(() => {
+        setAnimatingTileId(null);
+      }, 500);
+    }, 1500); // Animate a tile every 1.5 seconds
+
+    return () => {
+      clearInterval(animationInterval);
+    };
+  }, [mosaicTiles.length]);
 
   const handleAnalyze = () => {
     const storyToAnalyze = isUsingRandomStory ? hiddenStory : inputText;
@@ -271,7 +308,9 @@ export default function StoryGameApp() {
         {mosaicTiles.map((tile) => (
           <div 
             key={tile.id}
-            className={`${tile.color} aspect-square flex items-center justify-center text-lg md:text-xl lg:text-2xl`}
+            className={`${tile.color} aspect-square flex items-center justify-center text-lg md:text-xl lg:text-2xl transition-all duration-500 ease-in-out transform ${
+              animatingTileId === tile.id ? 'animate-tile-flip' : ''
+            }`}
           >
             {tile.emoji}
           </div>
