@@ -34,15 +34,16 @@ export async function getRandomStoryFromDb(): Promise<string> {
     const database = await initializeDatabase();
     
     // Try common table and column names for fables/stories
+    // Filter stories to 200 words or fewer (approximately 1000 characters)
     const possibleQueries = [
-      "SELECT text FROM stories ORDER BY RANDOM() LIMIT 1",
-      "SELECT content FROM stories ORDER BY RANDOM() LIMIT 1", 
-      "SELECT story FROM stories ORDER BY RANDOM() LIMIT 1",
-      "SELECT text FROM fables ORDER BY RANDOM() LIMIT 1",
-      "SELECT content FROM fables ORDER BY RANDOM() LIMIT 1",
-      "SELECT story FROM fables ORDER BY RANDOM() LIMIT 1",
-      "SELECT text FROM aesop_fables ORDER BY RANDOM() LIMIT 1",
-      "SELECT content FROM aesop_fables ORDER BY RANDOM() LIMIT 1"
+      "SELECT text FROM stories WHERE LENGTH(text) <= 1000 ORDER BY RANDOM() LIMIT 1",
+      "SELECT content FROM stories WHERE LENGTH(content) <= 1000 ORDER BY RANDOM() LIMIT 1", 
+      "SELECT story FROM stories WHERE LENGTH(story) <= 1000 ORDER BY RANDOM() LIMIT 1",
+      "SELECT text FROM fables WHERE LENGTH(text) <= 1000 ORDER BY RANDOM() LIMIT 1",
+      "SELECT content FROM fables WHERE LENGTH(content) <= 1000 ORDER BY RANDOM() LIMIT 1",
+      "SELECT story FROM fables WHERE LENGTH(story) <= 1000 ORDER BY RANDOM() LIMIT 1",
+      "SELECT text FROM aesop_fables WHERE LENGTH(text) <= 1000 ORDER BY RANDOM() LIMIT 1",
+      "SELECT content FROM aesop_fables WHERE LENGTH(content) <= 1000 ORDER BY RANDOM() LIMIT 1"
     ];
     
     let result = null;

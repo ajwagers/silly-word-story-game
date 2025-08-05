@@ -5,55 +5,101 @@ import { WordToReplace } from '../components/InteractiveModeForm';
 
 export function analyzeStory(text: string): WordToReplace[] {
   const doc = nlp(text);
-  const words: WordToReplace[] = [];
+  
+  // Calculate total words and target number of words to replace
+  const totalWords = text.split(/\s+/).filter(word => word.length > 0).length;
+  const targetWordsToReplace = Math.min(20, Math.max(1, Math.floor(totalWords / 8)));
+  
+  const allPotentialWords: WordToReplace[] = [];
   
   // Find nouns
   doc.nouns().forEach((noun, index) => {
     const nounText = noun.text();
-    const position = text.indexOf(nounText);
-    if (position !== -1) {
-      words.push({
+    let searchStart = 0;
+    let position = text.indexOf(nounText, searchStart);
+    
+    while (position !== -1) {
+      allPotentialWords.push({
         id: `noun-${index}`,
         original: nounText,
         partOfSpeech: 'noun',
         index,
         position
       });
+      searchStart = position + 1;
+      position = text.indexOf(nounText, searchStart);
     }
   });
   
   // Find adjectives
   doc.adjectives().forEach((adj, index) => {
     const adjText = adj.text();
-    const position = text.indexOf(adjText);
-    if (position !== -1) {
-      words.push({
+    let searchStart = 0;
+    let position = text.indexOf(adjText, searchStart);
+    
+    while (position !== -1) {
+      allPotentialWords.push({
         id: `adjective-${index}`,
         original: adjText,
         partOfSpeech: 'adjective',
         index,
         position
       });
+      searchStart = position + 1;
+      position = text.indexOf(adjText, searchStart);
     }
   });
   
   // Find verbs
   doc.verbs().forEach((verb, index) => {
     const verbText = verb.text();
-    const position = text.indexOf(verbText);
-    if (position !== -1) {
-      words.push({
+    let searchStart = 0;
+    let position = text.indexOf(verbText, searchStart);
+    
+    // Determine verb tense
+    const verbJson = verb.json()[0];
+    let tense = 'present'; // default
+    
+    if (verbJson && verbJson.terms && verbJson.terms[0]) {
+      const term = verbJson.terms[0];
+      if (term.tags && term.tags.includes('PastTense')) {
+        tense = 'past';
+      } else if (term.tags && term.tags.includes('PresentTense')) {
+        tense = 'present';
+      } else if (term.tags && term.tags.includes('FutureTense')) {
+        tense = 'future';
+      } else if (term.tags && term.tags.includes('Gerund')) {
+        tense = 'present (ing form)';
+      } else if (term.tags && term.tags.includes('Infinitive')) {
+        tense = 'infinitive';
+      }
+    }
+    
+    while (position !== -1) {
+      allPotentialWords.push({
         id: `verb-${index}`,
         original: verbText,
         partOfSpeech: 'verb',
+        tense,
         index,
         position
       });
+      searchStart = position + 1;
+      position = text.indexOf(verbText, searchStart);
     }
   });
   
-  // Sort by position in text and limit to 8 words for better mobile experience
-  return words.sort((a, b) => a.position - b.position).slice(0, 8);
+  // Remove duplicates based on position and original text
+  const uniqueWords = allPotentialWords.filter((word, index, array) => 
+    array.findIndex(w => w.position === word.position && w.original === word.original) === index
+  );
+  
+  // Randomly select words to ensure they're scattered throughout the story
+  const shuffledWords = [...uniqueWords].sort(() => Math.random() - 0.5);
+  const selectedWords = shuffledWords.slice(0, targetWordsToReplace);
+  
+  // Sort selected words by position in text for proper replacement order
+  return selectedWords.sort((a, b) => a.position - b.position);
 }
 
 export function generateStoryTemplate(originalText: string, words: WordToReplace[]): string {

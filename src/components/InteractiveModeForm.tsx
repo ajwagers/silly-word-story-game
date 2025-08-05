@@ -5,6 +5,7 @@ export interface WordToReplace {
   id: string;
   original: string;
   partOfSpeech: string;
+  tense?: string;
   replacement?: string;
   index: number;
   position: number;
@@ -43,13 +44,14 @@ const InteractiveModeForm: React.FC<InteractiveModeFormProps> = ({
           <div key={word.id} className="space-y-3 p-4 rounded-xl border-2 border-dashed border-gray-300 bg-gray-50">
             <label className="block text-lg font-bold text-center text-gray-900">
               {word.partOfSpeech.toUpperCase()}
+              {word.tense && ` (${word.tense.toUpperCase()} TENSE)`}
             </label>
             <input
               type="text"
               value={interactiveReplacements[word.id] || ''}
               onChange={(e) => onReplacementChange(word.id, e.target.value)}
               className="w-full p-3 border-2 rounded-xl text-center font-medium text-base bg-white border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
-              placeholder={`Silly ${word.partOfSpeech}!`}
+              placeholder={`Silly ${word.partOfSpeech}${word.tense ? ` (${word.tense} tense)` : ''}!`}
             />
           </div>
         ))}
