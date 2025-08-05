@@ -38,14 +38,18 @@ const CompletedStory = forwardRef<HTMLDivElement, CompletedStoryProps>(({
     if (!story || isTemplate) return story;
     
     let highlightedStory = story;
+    
+    // We need to process replacements in reverse order (highest position first)
+    // to maintain accurate positions as we modify the string
     const sortedWords = [...wordsToReplace].sort((a, b) => b.position - a.position);
     
     sortedWords.forEach(word => {
       const replacement = interactiveReplacements[word.id];
       if (replacement) {
-        const beforeReplacement = highlightedStory.substring(0, word.position);
-        const afterReplacement = highlightedStory.substring(word.position + replacement.length);
-        highlightedStory = beforeReplacement + `<span class="font-bold underline text-blue-600">${replacement}</span>` + afterReplacement;
+        // Find the exact word at the position and replace it with highlighted version
+        const beforeWord = highlightedStory.substring(0, word.position);
+        const afterWord = highlightedStory.substring(word.position + word.original.length);
+        highlightedStory = beforeWord + `<span class="font-bold underline text-blue-600">${replacement}</span>` + afterWord;
       }
     });
     
