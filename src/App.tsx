@@ -556,7 +556,7 @@ export default function StoryGameApp() {
         <section className="bg-yellow-200/95 backdrop-blur-sm py-16">
           <div className="max-w-4xl mx-auto text-center px-4">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              SIGN UP FOR OUR IRREGULAR NEWSLETTER \
+              SIGN UP FOR OUR IRREGULAR NEWSLETTER <br />
               (we don't send it out very often)
             </h2>
             <p className="text-lg text-gray-700 mb-8">
