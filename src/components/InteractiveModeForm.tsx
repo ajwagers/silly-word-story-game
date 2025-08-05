@@ -25,40 +25,43 @@ const InteractiveModeForm: React.FC<InteractiveModeFormProps> = ({
   onReplacementChange,
   onGenerateStory,
 }) => {
+  const allFieldsFilled = wordsToReplace.every(word => interactiveReplacements[word.id]?.trim());
+
   return (
-    <div className="rounded-3xl shadow-2xl p-8 mb-6 border-4" style={{backgroundColor: '#F9C74F', borderColor: '#2A9D8F'}}>
-      <div className="mb-4">
-        <h2 className="text-3xl font-black text-center p-4 rounded-2xl border-4" style={{color: '#264653', backgroundColor: 'white', borderColor: '#2A9D8F'}}>
+    <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg p-6 border">
+      <div className="mb-6">
+        <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-2">
           🌟 {storyTitle} 🌟
         </h2>
+        <p className="text-lg text-center text-gray-600">
+          Replace these words with something silly!
+        </p>
       </div>
-      <h3 className="text-2xl font-black mb-6 text-center" style={{color: '#264653'}}>
-        🎭 Replace These Words With Something SILLY! 🎭
-      </h3>
+      
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         {wordsToReplace.map((word) => (
-          <div key={word.id} className="space-y-3 p-4 rounded-2xl border-4 border-dashed" style={{backgroundColor: 'white', borderColor: '#2A9D8F'}}>
-            <label className="block text-lg font-black text-center" style={{color: '#264653'}}>
-              🎯 {word.partOfSpeech.toUpperCase()}:
+          <div key={word.id} className="space-y-3 p-4 rounded-xl border-2 border-dashed border-gray-300 bg-gray-50">
+            <label className="block text-lg font-bold text-center text-gray-900">
+              {word.partOfSpeech.toUpperCase()}
             </label>
             <input
               type="text"
               value={interactiveReplacements[word.id] || ''}
               onChange={(e) => onReplacementChange(word.id, e.target.value)}
-              className="w-full p-4 border-4 rounded-xl text-center font-bold text-lg shadow-inner"
-              style={{backgroundColor: '#E9C46A', borderColor: '#2A9D8F', color: '#264653'}}
-              placeholder={`🌈 Enter a silly ${word.partOfSpeech}! 🌈`}
+              className="w-full p-3 border-2 rounded-xl text-center font-medium text-base bg-white border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+              placeholder={`Silly ${word.partOfSpeech}!`}
             />
           </div>
         ))}
       </div>
+      
       <button
         onClick={onGenerateStory}
-        className="mt-6 flex items-center gap-3 text-white px-10 py-5 rounded-2xl font-black text-xl shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed mx-auto border-4"
-        style={{backgroundColor: '#2A9D8F', borderColor: '#264653'}}
+        disabled={!allFieldsFilled}
+        className="w-full flex items-center justify-center gap-3 text-white px-6 py-4 rounded-xl font-bold text-lg shadow-lg disabled:opacity-50 disabled:cursor-not-allowed bg-blue-600 hover:bg-blue-700 transition-all duration-200"
       >
         <FileText className="w-6 h-6" />
-        🎉 Generate My SILLY Story! 🎉
+        Generate My Story!
       </button>
     </div>
   );

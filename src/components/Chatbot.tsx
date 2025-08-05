@@ -34,15 +34,15 @@ const Chatbot: React.FC<ChatbotProps> = ({
   };
 
   return (
-    <div className="rounded-3xl shadow-2xl border-4 mb-6" style={{backgroundColor: '#E9C46A', borderColor: '#2A9D8F'}}>
+    <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg border">
       
       {/* Chat Header */}
-      <div className="p-4" style={{backgroundColor: '#2A9D8F'}}>
-        <h3 className="text-2xl font-black text-white text-center">🤖 Chat with Your Story Bot! 🤖</h3>
+      <div className="p-4 bg-green-600 rounded-t-xl">
+        <h3 className="text-xl md:text-2xl font-bold text-white text-center">🤖 Story Bot 🤖</h3>
       </div>
       
       {/* Chat Messages */}
-      <div className="h-96 overflow-y-auto p-6 space-y-4">
+      <div className="h-64 md:h-96 overflow-y-auto p-6 space-y-4 bg-gray-50">
         {chatMessages.map((message, index) => (
           <div
             key={index}
@@ -50,28 +50,19 @@ const Chatbot: React.FC<ChatbotProps> = ({
               message.sender === 'user' ? 'flex-row-reverse' : ''
             }`}
           >
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center border-4 shadow-lg ${
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 shadow-lg flex-shrink-0 ${
               message.sender === 'bot' 
-                ? 'text-white' 
-                : 'text-white'
-            }`}
-              style={{
-                backgroundColor: message.sender === 'bot' ? '#264653' : '#2A9D8F',
-                borderColor: 'white'
-              }}>
-              {message.sender === 'bot' ? <Bot className="w-6 h-6" /> : <User className="w-6 h-6" />}
+                ? 'bg-green-600 border-green-700 text-white' 
+                : 'bg-blue-600 border-blue-700 text-white'
+            }`}>
+              {message.sender === 'bot' ? <Bot className="w-5 h-5" /> : <User className="w-5 h-5" />}
             </div>
-            <div className={`max-w-xs lg:max-w-md px-6 py-4 rounded-2xl border-4 shadow-lg ${
+            <div className={`max-w-xs md:max-w-md px-4 py-3 rounded-xl border shadow-lg ${
               message.sender === 'bot'
-                ? ''
-                : ''
-            }`}
-              style={{
-                backgroundColor: message.sender === 'bot' ? '#F9C74F' : '#2A9D8F',
-                borderColor: message.sender === 'bot' ? '#264653' : 'white',
-                color: message.sender === 'bot' ? '#264653' : 'white'
-              }}>
-              <p className="text-base font-bold">{message.text}</p>
+                ? 'bg-white border-gray-300 text-gray-900'
+                : 'bg-blue-600 border-blue-700 text-white'
+            }`}>
+              <p className="text-sm md:text-base font-medium">{message.text}</p>
             </div>
           </div>
         ))}
@@ -79,24 +70,22 @@ const Chatbot: React.FC<ChatbotProps> = ({
       </div>
 
       {/* Chat Input */}
-      <div className="border-t-4 p-6" style={{borderColor: '#2A9D8F', backgroundColor: '#F4A261'}}>
+      <div className="border-t p-6 bg-white rounded-b-xl">
         <div className="flex gap-4">
           <input
             type="text"
             value={userResponse}
             onChange={(e) => setUserResponse(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="🌈 Type your silly word here! 🌈"
-            className="flex-1 p-4 border-4 rounded-2xl text-lg font-bold text-center shadow-inner"
-            style={{backgroundColor: '#F9C74F', borderColor: '#2A9D8F', color: '#264653'}}
+            placeholder="Type your silly word!"
+            className="flex-1 p-3 border-2 rounded-xl text-center font-medium text-base bg-gray-50 border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
           />
           <button
             onClick={onSendMessage}
             disabled={!userResponse.trim()}
-            className="text-white px-8 py-4 rounded-2xl font-black shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed border-4"
-            style={{backgroundColor: '#2A9D8F', borderColor: 'white'}}
+            className="text-white px-6 py-3 rounded-xl font-bold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed bg-blue-600 hover:bg-blue-700 transition-all duration-200"
           >
-            <Send className="w-6 h-6" />
+            <Send className="w-5 h-5" />
           </button>
         </div>
       </div>

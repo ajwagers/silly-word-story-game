@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   Sparkles,
   Gamepad2,
@@ -7,11 +7,15 @@ import {
   FileText,
   PenLine,
   Download,
+  Share2,
+  RefreshCw,
+  Menu,
+  X,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Accordion,
@@ -19,122 +23,623 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "@/components/ui/accordion";
+import GameSetup from "./components/GameSetup";
+import InteractiveModeForm, { WordToReplace } from "./components/InteractiveModeForm";
+import CompletedStory, { DisplayMode } from "./components/CompletedStory";
+import Chatbot, { ChatMessage } from "./components/Chatbot";
+import { analyzeStory, generateStoryTemplate, downloadPDF, shareStory } from "./utils/storyUtils";
+import { getRandomStoryFromDb } from "./utils/dbUtils";
+
+// Generate mosaic tiles data
+const colors = [
+  'bg-green-400', 'bg-teal-500', 'bg-red-400', 'bg-yellow-400', 'bg-pink-400', 
+  'bg-purple-400', 'bg-blue-300', 'bg-yellow-300', 'bg-orange-400', 'bg-green-500',
+  'bg-blue-400', 'bg-red-300', 'bg-yellow-500', 'bg-pink-300', 'bg-purple-300',
+  'bg-teal-400', 'bg-blue-500', 'bg-yellow-600', 'bg-pink-500', 'bg-green-300',
+  'bg-orange-300', 'bg-purple-500', 'bg-red-500', 'bg-teal-300'
+];
+
+const emojis = [
+  '🐢', '📡', '🏢', '🔔', '🌸', '🌲', '☁️', '⚙️', '🏠', '🌋',
+  '👁️', '🎸', '💡', '🐙', '🎯', '🌊', '🌳', '🎭', '🌿', '🦋',
+  '🎨', '🎪', '🐘', '🚀', '🎮', '📚', '🎵', '🌟', '🎈', '🎁',
+  '🌺', '🦄', '🌈', '🎊', '🎉', '🎀', '🎂', '🍭', '🌙', '⭐'
+];
+
+const generateMosaicTiles = () => {
+  const tiles = [];
+  for (let i = 0; i < 200; i++) {
+    tiles.push({
+      id: i,
+      color: colors[i % colors.length],
+      emoji: emojis[i % emojis.length]
+    });
+  }
+  return tiles;
+};
+
+export enum GameMode {
+  Interactive = 'interactive',
+  Static = 'static',
+  Chatbot = 'chatbot',
+}
+
+export enum GameState {
+  Setup = 'setup',
+  Playing = 'playing',
+  Completed = 'completed',
+  Chatting = 'chatting',
+}
 
 export default function StoryGameApp() {
-  const [mode, setMode] = useState("interactive");
-  const [story, setStory] = useState("");
-  const [step, setStep] = useState(1);
+  const [gameState, setGameState] = useState<GameState>(GameState.Setup);
+  const [mode, setMode] = useState<GameMode>(GameMode.Interactive);
+  const [inputText, setInputText] = useState("");
+  const [wordsToReplace, setWordsToReplace] = useState<WordToReplace[]>([]);
+  const [interactiveReplacements, setInteractiveReplacements] = useState<{ [key: string]: string }>({});
+  const [completedStory, setCompletedStory] = useState("");
+  const [staticTemplate, setStaticTemplate] = useState("");
+  const [hiddenStory, setHiddenStory] = useState("");
+  const [isUsingRandomStory, setIsUsingRandomStory] = useState(false);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [userResponse, setUserResponse] = useState("");
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isLoadingStory, setIsLoadingStory] = useState(false);
+  const [mosaicTiles, setMosaicTiles] = useState(() => generateMosaicTiles());
+  const [animatingTileId, setAnimatingTileId] = useState<number | null>(null);
+  
+  const storyRef = useRef<HTMLDivElement>(null);
+  const gameSetupRef = useRef<HTMLDivElement>(null);
+  const howToPlayRef = useRef<HTMLDivElement>(null);
 
-  const steps = [
-    { id: 1, label: "Write" },
-    { id: 2, label: "Find Words" },
-    { id: 3, label: "Add Silly" },
-    { id: 4, label: "Enjoy" },
-  ];
+  // Background tile animation effect
+  useEffect(() => {
+    const animationInterval = setInterval(() => {
+      // Select a random tile to animate
+      const randomIndex = Math.floor(Math.random() * mosaicTiles.length);
+      const tileToAnimate = mosaicTiles[randomIndex];
+      
+      // Start the animation
+      setAnimatingTileId(tileToAnimate.id);
+      
+      // Change the tile's content halfway through the animation
+      setTimeout(() => {
+        setMosaicTiles(prevTiles => 
+          prevTiles.map(tile => 
+            tile.id === tileToAnimate.id
+              ? {
+                  ...tile,
+                  color: colors[Math.floor(Math.random() * colors.length)],
+                  emoji: emojis[Math.floor(Math.random() * emojis.length)]
+                }
+              : tile
+          )
+        );
+      }, 250); // Halfway through the 500ms animation
+      
+      // End the animation
+      setTimeout(() => {
+        setAnimatingTileId(null);
+      }, 500);
+    }, 1500); // Animate a tile every 1.5 seconds
+
+    return () => {
+      clearInterval(animationInterval);
+    };
+  }, [mosaicTiles.length]);
+
+  const handleAnalyze = () => {
+    const storyToAnalyze = isUsingRandomStory ? hiddenStory : inputText;
+    const words = analyzeStory(storyToAnalyze);
+    setWordsToReplace(words);
+    setGameState(GameState.Playing);
+  };
+
+  const handleGenerateTemplate = () => {
+    const storyToAnalyze = isUsingRandomStory ? hiddenStory : inputText;
+    const words = analyzeStory(storyToAnalyze);
+    const template = generateStoryTemplate(storyToAnalyze, words);
+    setWordsToReplace(words);
+    setStaticTemplate(template);
+    setGameState(GameState.Completed);
+  };
+
+  const handleStartChatbot = () => {
+    const storyToAnalyze = isUsingRandomStory ? hiddenStory : inputText;
+    const words = analyzeStory(storyToAnalyze);
+    setWordsToReplace(words);
+    setCurrentWordIndex(0);
+    
+    const initialMessage: ChatMessage = {
+      sender: 'bot',
+      text: `🎭 Welcome to your silly story adventure! I found ${words.length} words we can make hilarious! Let's start with the first one: I need a silly ${words[0]?.partOfSpeech}!`,
+      timestamp: Date.now(),
+    };
+    
+    setChatMessages([initialMessage]);
+    setGameState(GameState.Chatting);
+  };
+
+  const handleReplacementChange = (wordId: string, value: string) => {
+    setInteractiveReplacements(prev => ({
+      ...prev,
+      [wordId]: value
+    }));
+  };
+
+  const handleGenerateStory = () => {
+    let story = isUsingRandomStory ? hiddenStory : inputText;
+    const sortedWords = [...wordsToReplace].sort((a, b) => b.position - a.position);
+    
+    sortedWords.forEach(word => {
+      const replacement = interactiveReplacements[word.id];
+      if (replacement) {
+        story = story.substring(0, word.position) + replacement + story.substring(word.position + word.original.length);
+      }
+    });
+    
+    setCompletedStory(story);
+    setGameState(GameState.Completed);
+  };
+
+  const handleSendMessage = () => {
+    if (!userResponse.trim() || currentWordIndex >= wordsToReplace.length) return;
+
+    const userMessage: ChatMessage = {
+      sender: 'user',
+      text: userResponse,
+      timestamp: Date.now(),
+    };
+
+    const updatedReplacements = {
+      ...interactiveReplacements,
+      [wordsToReplace[currentWordIndex].id]: userResponse
+    };
+    setInteractiveReplacements(updatedReplacements);
+
+    const nextIndex = currentWordIndex + 1;
+    let botResponse: ChatMessage;
+
+    if (nextIndex < wordsToReplace.length) {
+      botResponse = {
+        sender: 'bot',
+        text: `🎉 Great choice! Now I need a silly ${wordsToReplace[nextIndex].partOfSpeech}!`,
+        timestamp: Date.now() + 100,
+      };
+      setCurrentWordIndex(nextIndex);
+    } else {
+      let story = isUsingRandomStory ? hiddenStory : inputText;
+      const sortedWords = [...wordsToReplace].sort((a, b) => b.position - a.position);
+      
+      sortedWords.forEach(word => {
+        const replacement = updatedReplacements[word.id];
+        if (replacement) {
+          story = story.substring(0, word.position) + replacement + story.substring(word.position + word.original.length);
+        }
+      });
+      
+      setCompletedStory(story);
+      botResponse = {
+        sender: 'bot',
+        text: `🎭 AMAZING! Your hilarious story is ready! Scroll down to see your masterpiece! 🎉`,
+        timestamp: Date.now() + 100,
+      };
+      setGameState(GameState.Completed);
+    }
+
+    setChatMessages(prev => [...prev, userMessage, botResponse]);
+    setUserResponse("");
+  };
+
+  const handleLoadRandomStory = async () => {
+    setIsLoadingStory(true);
+    try {
+      const randomStory = await getRandomStoryFromDb();
+      setHiddenStory(randomStory);
+      setIsUsingRandomStory(true);
+      setInputText(""); // Clear the visible input
+    } catch (error) {
+      console.error('Error loading random story:', error);
+      alert('Sorry, could not load a random story. Please try again or enter your own story.');
+    } finally {
+      setIsLoadingStory(false);
+    }
+  };
+
+  const handleDownloadPDF = () => {
+    const content = gameState === GameState.Completed && mode === GameMode.Static ? staticTemplate : completedStory;
+    const title = mode === GameMode.Static ? "Story Template" : "Silly Story";
+    downloadPDF(content, title, storyRef.current);
+  };
+
+  const handleShareStory = () => {
+    shareStory(completedStory);
+  };
+
+  const handleReset = () => {
+    setGameState(GameState.Setup);
+    setInputText("");
+    setHiddenStory("");
+    setIsUsingRandomStory(false);
+    setWordsToReplace([]);
+    setInteractiveReplacements({});
+    setCompletedStory("");
+    setStaticTemplate("");
+    setChatMessages([]);
+    setUserResponse("");
+    setCurrentWordIndex(0);
+    setMobileMenuOpen(false);
+  };
+
+  const scrollToGameSetup = () => {
+    gameSetupRef.current?.scrollIntoView({ 
+      behavior: 'smooth',
+      block: 'start'
+    });
+    setMobileMenuOpen(false);
+  };
+  
+  const scrollToHowToPlay = () => {
+    howToPlayRef.current?.scrollIntoView({ 
+      behavior: 'smooth',
+      block: 'start'
+    });
+    setMobileMenuOpen(false);
+  };
+  
+  const getStoryTitle = () => {
+    switch (mode) {
+      case GameMode.Interactive:
+        return "Interactive Story";
+      case GameMode.Static:
+        return "Story Template";
+      case GameMode.Chatbot:
+        return "Chat Story Adventure";
+      default:
+        return "Your Story";
+    }
+  };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-yellow-100 via-pink-100 to-blue-100 text-slate-800 font-['Quicksand',sans-serif] flex flex-col items-center p-6 md:p-12 relative overflow-hidden">
-      {/* Background Characters */}
-      <div className="absolute inset-0 z-0 pointer-events-none bg-repeat opacity-20" style={{ backgroundImage: "url('/mascot-pattern.svg')" }}></div>
-
-      <header className="text-center mb-10 space-y-3 z-10">
-        <h1 className="text-5xl md:text-7xl font-extrabold text-indigo-700 tracking-tight">
-          <span className="inline-flex items-center gap-2">
-            <Sparkles className="w-10 h-10 text-yellow-400 animate-bounce" />
-            Silly Word Story Game
-          </span>
-        </h1>
-        <p className="max-w-xl mx-auto text-xl md:text-2xl text-indigo-500">
-          Let your imagination run wild with delightfully silly stories!
-        </p>
-      </header>
-
-      <Progress className="w-full max-w-2xl h-2 rounded-full bg-indigo-100 z-10" value={(step / steps.length) * 100} />
-      <div className="flex justify-between w-full max-w-2xl px-1 mt-2 text-xs md:text-sm z-10">
-        {steps.map(({ id, label }) => (
-          <span
-            key={id}
-            className={`uppercase tracking-wider ${
-              id <= step ? "text-indigo-700 font-semibold" : "text-slate-400"
+    <div className="min-h-screen relative">
+      {/* Full-page mosaic background */}
+      <div className="fixed inset-0 grid grid-cols-8 md:grid-cols-12 lg:grid-cols-16 gap-0 z-0 overflow-hidden">
+        {mosaicTiles.map((tile) => (
+          <div 
+            key={tile.id}
+            className={`${tile.color} aspect-square flex items-center justify-center text-lg md:text-xl lg:text-2xl transition-all duration-500 ease-in-out transform ${
+              animatingTileId === tile.id ? 'animate-tile-flip' : ''
             }`}
           >
-            {label}
-          </span>
+            {tile.emoji}
+          </div>
         ))}
       </div>
 
-      <section className="w-full max-w-4xl mt-12 z-10">
-        <Tabs value={mode} onValueChange={setMode} className="w-full">
-          <TabsList className="grid grid-cols-3 bg-yellow-200 rounded-full p-1 shadow-md">
-            <TabsTrigger value="interactive" className="rounded-full px-4 py-2 text-indigo-700 font-semibold hover:bg-yellow-300">
-              <Gamepad2 className="inline w-5 h-5 mr-1" /> Interactive
-            </TabsTrigger>
-            <TabsTrigger value="static" className="rounded-full px-4 py-2 text-indigo-700 font-semibold hover:bg-yellow-300">
-              <FileText className="inline w-5 h-5 mr-1" /> Static
-            </TabsTrigger>
-            <TabsTrigger value="chat" className="rounded-full px-4 py-2 text-indigo-700 font-semibold hover:bg-yellow-300">
-              <Bot className="inline w-5 h-5 mr-1" /> Chatbot
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </section>
+      {/* Content overlay */}
+      <div className="relative z-10">
+        {/* Navigation Header */}
+        <nav className="bg-white/95 backdrop-blur-sm shadow-sm border-b sticky top-0 z-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center h-16">
+              {/* Logo */}
+              <div className="flex items-center">
+                <div className="bg-black text-white px-3 py-1 rounded font-bold text-lg tracking-tight">
+                  📚 FILL-IN-FABLES
+                </div>
+              </div>
+              
+              {/* Desktop Navigation */}
+              <div className="hidden md:flex space-x-8">
+                <button 
+                  onClick={scrollToGameSetup}
+                  className="text-gray-600 hover:text-gray-900 font-medium transition-colors"
+                >
+                  MAKE STORIES
+                </button>
+                <button className="text-gray-600 hover:text-gray-900 font-medium transition-colors">
+                  ABOUT US
+                </button>
+                <button 
+                  onClick={scrollToHowToPlay}
+                  className="text-gray-600 hover:text-gray-900 font-medium transition-colors"
+                >
+                  GET HELP
+                </button>
+              </div>
 
-      <section className="w-full max-w-5xl mt-12 grid md:grid-cols-2 gap-10 z-10">
-        <div className="bg-white rounded-3xl p-6 shadow-xl border border-indigo-100 hover:shadow-2xl hover:scale-105 transition-all duration-300">
-          <h2 className="flex items-center gap-2 text-2xl font-bold text-indigo-600 mb-4">
-            <BookOpen className="w-6 h-6 text-yellow-400" /> Your Story
-          </h2>
-          <Textarea
-            rows={8}
-            placeholder="Once upon a time in a far‑away land…"
-            value={story}
-            onChange={(e) => setStory(e.target.value)}
-            className="resize-none bg-yellow-50 focus:bg-white focus:ring-2 focus:ring-indigo-400 rounded-xl border-2 border-yellow-200 text-lg"
-          />
-          <div className="flex justify-end mt-4">
-            <Button
-              className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-full hover:scale-105 transition-all duration-200"
-              disabled={!story.trim()}
-              onClick={() => setStep((prev) => Math.min(prev + 1, 4))}
-            >
-              <PenLine className="w-4 h-4 mr-2" /> Analyze Story
-            </Button>
+              {/* Mobile menu button */}
+              <div className="md:hidden">
+                <button
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="text-gray-600 hover:text-gray-900"
+                >
+                  {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div className="bg-indigo-50 rounded-3xl p-6 shadow-inner flex items-center justify-center min-h-[14rem] text-indigo-500 text-lg italic hover:bg-indigo-100 transition-all duration-300">
-          {step === 1 ? (
-            <span>Your silly preview will appear here…</span>
-          ) : (
-            <span>[TODO: Interactive blank replacement UI]</span>
+          {/* Mobile Navigation */}
+          {mobileMenuOpen && (
+            <div className="md:hidden bg-white/95 backdrop-blur-sm border-t px-4 py-4 space-y-2">
+              <button 
+                onClick={scrollToGameSetup}
+                className="block w-full text-left text-gray-600 hover:text-gray-900 font-medium transition-colors"
+              >
+                MAKE STORIES
+              </button>
+              <button className="block w-full text-left text-gray-600 hover:text-gray-900 font-medium transition-colors">
+                ABOUT US
+              </button>
+              <button 
+                onClick={scrollToHowToPlay}
+                className="block w-full text-left text-gray-600 hover:text-gray-900 font-medium transition-colors"
+              >
+                GET HELP
+              </button>
+            </div>
           )}
-        </div>
-      </section>
+        </nav>
 
-      <section className="w-full max-w-4xl mt-14 z-10">
-        <Accordion type="single" collapsible defaultValue="how">
-          <AccordionItem value="how">
-            <AccordionTrigger className="text-xl font-semibold text-indigo-700 hover:text-indigo-800 transition-colors duration-200">
-              How to Play This Awesome Game
-            </AccordionTrigger>
-            <AccordionContent className="space-y-3 text-indigo-600 text-md">
-              <ul className="list-decimal list-inside space-y-2">
-                <li className="hover:text-indigo-800 transition-colors duration-200">Write or paste a story in the text area.</li>
-                <li className="hover:text-indigo-800 transition-colors duration-200">Choose a fun mode to play in.</li>
-                <li className="hover:text-indigo-800 transition-colors duration-200">Let AI pick the perfect words to swap.</li>
-                <li className="hover:text-indigo-800 transition-colors duration-200">Add your wacky replacements.</li>
-                <li className="hover:text-indigo-800 transition-colors duration-200">Download or share your hilarious creation!</li>
-              </ul>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-      </section>
+        {/* Hero Section */}
+        <section className="text-center py-16 md:py-24 lg:py-32">
+          <div className="max-w-4xl mx-auto px-4">
+            <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-8 md:p-12 shadow-2xl border border-gray-200">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 leading-tight">
+                MAKE YOUR OWN<br />
+                HILARIOUS STORIES — <br />
+                just add YOUR words!
+              </h1>
+              <p className="text-lg md:text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
+                Ever wanted to be the author of the silliest story ever? Pick some wacky words, fill in the blanks, and watch your tale come to life! Every time you play, your story is different—giggles guaranteed.
+              </p>
+              <button 
+                onClick={scrollToGameSetup}
+                className="bg-black text-white px-8 py-3 rounded font-semibold hover:bg-gray-800 transition-colors"
+              >
+                LETS GET STARTED!
+              </button>
+            </div>
+          </div>
+        </section>
 
-      {step === 4 && (
-        <Button className="mt-12 bg-green-500 hover:bg-green-600 text-white px-6 py-3 text-lg rounded-full shadow-lg z-10 hover:scale-105 transition-all duration-200">
-          <Download className="w-5 h-5 mr-2" /> Download Story
-        </Button>
-      )}
-    </main>
+        {/* Game Setup Section - Always Visible */}
+        <section ref={gameSetupRef} className="max-w-6xl mx-auto px-4 py-8">
+          <div className="space-y-8">
+            {/* Mode Selection */}
+            <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg p-6 border">
+              <h3 className="text-xl font-bold text-gray-900 mb-6 text-center">Choose Your Adventure</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button
+                  onClick={() => setMode(GameMode.Interactive)}
+                  className={`p-6 rounded-xl border-2 transition-all duration-200 ${
+                    mode === GameMode.Interactive
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                  }`}
+                >
+                  <div className="text-center">
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-purple-100 flex items-center justify-center">
+                      <Gamepad2 className="w-8 h-8 text-purple-600" />
+                    </div>
+                    <h4 className="font-bold text-lg mb-2">Interactive Mode</h4>
+                    <p className="text-sm text-gray-600">Fill in words step by step</p>
+                  </div>
+                </button>
+                
+                <button
+                  onClick={() => setMode(GameMode.Static)}
+                  className={`p-6 rounded-xl border-2 transition-all duration-200 ${
+                    mode === GameMode.Static
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                  }`}
+                >
+                  <div className="text-center">
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-orange-100 flex items-center justify-center">
+                      <FileText className="w-8 h-8 text-orange-600" />
+                    </div>
+                    <h4 className="font-bold text-lg mb-2">Template Mode</h4>
+                    <p className="text-sm text-gray-600">Get a printable template</p>
+                  </div>
+                </button>
+                
+                <button
+                  onClick={() => setMode(GameMode.Chatbot)}
+                  className={`p-6 rounded-xl border-2 transition-all duration-200 ${
+                    mode === GameMode.Chatbot
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                  }`}
+                >
+                  <div className="text-center">
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-green-100 flex items-center justify-center">
+                      <Bot className="w-8 h-8 text-green-600" />
+                    </div>
+                    <h4 className="font-bold text-lg mb-2">Chat Adventure</h4>
+                    <p className="text-sm text-gray-600">Interactive AI guidance</p>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            {/* Story Input */}
+            <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg p-6 border">
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="story-input" className="block text-lg font-bold mb-3 text-slate-800">
+                    📝 Enter Your Story
+                  </label>
+                  <Textarea
+                    id="story-input"
+                    value={inputText}
+                    onChange={(e) => setInputText(e.target.value)}
+                    placeholder={isUsingRandomStory ? "🎲 Random story loaded! Choose your game mode to start playing..." : "Once upon a time, there was a brave knight who lived in a magical castle..."}
+                    disabled={isUsingRandomStory}
+                    className="w-full h-32 md:h-40 p-4 border-2 rounded-xl text-base font-medium resize-none bg-gray-50 border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+                  />
+                </div>
+                
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button
+                    onClick={handleLoadRandomStory}
+                    disabled={isLoadingStory}
+                    className="flex-1 px-4 py-3 rounded-xl font-bold text-base border-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 bg-purple-600 border-purple-600 text-white hover:bg-purple-700 hover:border-purple-700 transition-all duration-200"
+                  >
+                    <Sparkles className="w-5 h-5" />
+                    {isLoadingStory ? 'Loading...' : 'Load Random Story'}
+                  </button>
+                  
+                  {inputText.trim() && (
+                    <button
+                      onClick={() => {
+                        setInputText('');
+                        setHiddenStory('');
+                        setIsUsingRandomStory(false);
+                      }}
+                      className="px-4 py-3 rounded-xl font-bold text-base border-2 bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200 hover:border-gray-400 transition-all duration-200"
+                    >
+                      Clear
+                    </button>
+                  )}
+                  
+                  {isUsingRandomStory && (
+                    <button
+                      onClick={() => {
+                        setHiddenStory('');
+                        setIsUsingRandomStory(false);
+                      }}
+                      className="px-4 py-3 rounded-xl font-bold text-base border-2 bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200 hover:border-gray-400 transition-all duration-200"
+                    >
+                      Clear Random Story
+                    </button>
+                  )}
+                </div>
+                
+                <div className="pt-4">
+                  {mode === GameMode.Interactive && (
+                    <button
+                      onClick={handleAnalyze}
+                      disabled={!inputText.trim() && !isUsingRandomStory}
+                      className="w-full px-6 py-4 rounded-xl font-bold text-lg border-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 bg-blue-600 border-blue-600 text-white hover:bg-blue-700 hover:border-blue-700 transition-all duration-200"
+                    >
+                      <FileText className="w-5 h-5" />
+                      Find Words to Replace
+                    </button>
+                  )}
+                  
+                  {mode === GameMode.Static && (
+                    <button
+                      onClick={handleGenerateTemplate}
+                      disabled={!inputText.trim() && !isUsingRandomStory}
+                      className="w-full px-6 py-4 rounded-xl font-bold text-lg border-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 bg-orange-600 border-orange-600 text-white hover:bg-orange-700 hover:border-orange-700 transition-all duration-200"
+                    >
+                      <FileText className="w-5 h-5" />
+                      Generate Template
+                    </button>
+                  )}
+                  
+                  {mode === GameMode.Chatbot && (
+                    <button
+                      onClick={handleStartChatbot}
+                      disabled={!inputText.trim() && !isUsingRandomStory}
+                      className="w-full px-6 py-4 rounded-xl font-bold text-lg border-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 bg-green-600 border-green-600 text-white hover:bg-green-700 hover:border-green-700 transition-all duration-200"
+                    >
+                      <Bot className="w-5 h-5" />
+                      Start Chat Adventure
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Game Content Section */}
+        {(gameState === GameState.Playing || gameState === GameState.Chatting || gameState === GameState.Completed) && (
+          <section className="max-w-6xl mx-auto px-4 py-8">
+            {gameState === GameState.Playing && mode === GameMode.Interactive && (
+              <InteractiveModeForm
+                storyTitle={getStoryTitle()}
+                wordsToReplace={wordsToReplace}
+                interactiveReplacements={interactiveReplacements}
+                onReplacementChange={handleReplacementChange}
+                onGenerateStory={handleGenerateStory}
+              />
+            )}
+
+            {gameState === GameState.Chatting && mode === GameMode.Chatbot && (
+              <Chatbot
+                chatMessages={chatMessages}
+                userResponse={userResponse}
+                setUserResponse={setUserResponse}
+                onSendMessage={handleSendMessage}
+              />
+            )}
+
+            {gameState === GameState.Completed && (
+              <CompletedStory
+                ref={storyRef}
+                storyTitle={getStoryTitle()}
+                completedStory={completedStory}
+                staticTemplate={staticTemplate}
+                wordsToReplace={wordsToReplace}
+                displayMode={mode === GameMode.Static ? DisplayMode.Template : DisplayMode.Story}
+                onDownloadPDF={handleDownloadPDF}
+                onShareStory={handleShareStory}
+                onReset={handleReset}
+              />
+            )}
+          </section>
+        )}
+
+        {/* How to Play Section - Always Visible */}
+        <section ref={howToPlayRef} className="max-w-6xl mx-auto px-4 py-8">
+          <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg p-6 border">
+            <Accordion type="single" collapsible>
+              <AccordionItem value="how">
+                <AccordionTrigger className="text-xl font-bold text-gray-900 hover:text-gray-700">
+                  How to Play This Game
+                </AccordionTrigger>
+                <AccordionContent className="space-y-3 text-gray-700">
+                  <ol className="list-decimal list-inside space-y-2">
+                    <li>Write or paste a story in the text area</li>
+                    <li>Choose your preferred game mode</li>
+                    <li>Let AI find the perfect words to replace</li>
+                    <li>Add your wacky replacements</li>
+                    <li>Download, share, or enjoy your hilarious creation!</li>
+                  </ol>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
+        </section>
+
+        {/* Newsletter Section - Always Visible */}
+        <section className="bg-yellow-200/95 backdrop-blur-sm py-16">
+          <div className="max-w-4xl mx-auto text-center px-4">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              SIGN UP FOR OUR IRREGULAR NEWSLETTER <br />
+              (we don't send it out very often)
+            </h2>
+            <p className="text-lg text-gray-700 mb-8">
+              Keep up on what is new, discover new story ideas, and collect creative writing tips.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+              <input
+                type="email"
+                placeholder="Email address"
+                className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+              />
+              <button className="bg-black text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors">
+                SIGN UP
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
   );
 }

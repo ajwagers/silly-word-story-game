@@ -32,50 +32,47 @@ const CompletedStory = forwardRef<HTMLDivElement, CompletedStoryProps>(({
   const content = isTemplate ? staticTemplate : completedStory;
 
   return (
-    <div className="rounded-3xl shadow-2xl p-8 border-4 mb-6" style={{backgroundColor: '#E9C46A', borderColor: '#2A9D8F'}}>
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-3xl font-black p-4 rounded-2xl border-4" style={{color: '#264653', backgroundColor: 'white', borderColor: '#2A9D8F'}}>
+    <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg p-6 border">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 space-y-4 md:space-y-0">
+        <h2 className="text-2xl md:text-3xl font-bold text-center md:text-left text-gray-900">
           🎉 {storyTitle} 🎉
         </h2>
-        <div className="flex gap-4">
+        <div className="flex flex-col sm:flex-row gap-3">
           <button
             onClick={onDownloadPDF}
-            className="flex items-center gap-2 text-white px-6 py-3 rounded-2xl font-black shadow-xl border-4"
-            style={{backgroundColor: '#F4A261', borderColor: 'white'}}
+            className="flex items-center justify-center gap-2 text-white px-4 py-3 rounded-xl font-bold shadow-lg bg-green-600 hover:bg-green-700 transition-all duration-200"
           >
-            <Download className="w-5 h-5" />
-            📄 PDF
+            <Download className="w-4 h-4" />
+            PDF
           </button>
           {!isTemplate && (
             <button
               onClick={onShareStory}
-              className="flex items-center gap-2 text-white px-6 py-3 rounded-2xl font-black shadow-xl border-4"
-              style={{backgroundColor: '#2A9D8F', borderColor: 'white'}}
+              className="flex items-center justify-center gap-2 text-white px-4 py-3 rounded-xl font-bold shadow-lg bg-blue-600 hover:bg-blue-700 transition-all duration-200"
             >
-              <Share2 className="w-5 h-5" />
-              📤 Share
+              <Share2 className="w-4 h-4" />
+              Share
             </button>
           )}
           <button
             onClick={onReset}
-            className="flex items-center gap-2 text-white px-6 py-3 rounded-2xl font-black shadow-xl border-4"
-            style={{backgroundColor: '#264653', borderColor: 'white'}}
+            className="flex items-center justify-center gap-2 text-white px-4 py-3 rounded-xl font-bold shadow-lg bg-gray-600 hover:bg-gray-700 transition-all duration-200"
           >
-            <RefreshCw className="w-5 h-5" />
-            🔄 {isTemplate ? 'New Template' : 'New Game'}
+            <RefreshCw className="w-4 h-4" />
+            New Game
           </button>
         </div>
       </div>
       
       {isTemplate ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Word List */}
-          <div className="p-6 rounded-2xl border-4 shadow-xl" style={{backgroundColor: '#F4A261', borderColor: '#2A9D8F'}}>
-            <h4 className="font-black mb-4 text-xl text-center" style={{color: '#264653'}}>🎯 Words You Need:</h4>
+          <div className="p-6 rounded-xl border-2 border-dashed border-gray-300 bg-gray-50">
+            <h4 className="font-bold mb-4 text-xl text-center text-gray-900">Words You Need:</h4>
             <ol className="list-none space-y-3">
               {wordsToReplace.map((word, index) => (
-                <li key={word.id} className="p-3 rounded-xl border-2 font-bold flex items-center gap-3" style={{backgroundColor: 'white', borderColor: '#2A9D8F', color: '#264653'}}>
-                  <span className="text-white w-8 h-8 rounded-full flex items-center justify-center font-black text-sm" style={{backgroundColor: '#2A9D8F'}}>
+                <li key={word.id} className="p-3 rounded-xl border font-bold flex items-center gap-3 bg-white border-gray-300 text-gray-900">
+                  <span className="text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm bg-blue-600">
                     {index + 1}
                   </span>
                   {word.partOfSpeech.toUpperCase()}
@@ -87,11 +84,10 @@ const CompletedStory = forwardRef<HTMLDivElement, CompletedStoryProps>(({
           {/* Template Story */}
           <div 
             ref={ref}
-            className="p-6 rounded-2xl border-4 shadow-xl"
-            style={{backgroundColor: '#F9C74F', borderColor: '#2A9D8F'}}
+            className="p-6 rounded-xl border-2 border-dashed border-gray-300 bg-gray-50"
           >
-            <h4 className="font-black mb-4 text-xl text-center" style={{color: '#264653'}}>📝 Your Story Template:</h4>
-            <p className="leading-relaxed font-bold text-lg p-4 rounded-xl border-2" style={{color: '#264653', backgroundColor: 'white', borderColor: '#2A9D8F'}}>
+            <h4 className="font-bold mb-4 text-xl text-center text-gray-900">Your Story Template:</h4>
+            <p className="leading-relaxed font-medium text-lg p-4 rounded-xl border text-gray-900 bg-white border-gray-300">
               {content}
             </p>
           </div>
@@ -99,13 +95,12 @@ const CompletedStory = forwardRef<HTMLDivElement, CompletedStoryProps>(({
       ) : (
         <div 
           ref={ref}
-          className="p-8 rounded-2xl border-4 shadow-2xl"
-          style={{backgroundColor: '#F9C74F', borderColor: '#2A9D8F'}}
+          className="p-6 rounded-xl border-2 border-dashed border-gray-300 bg-gray-50"
         >
-          <div className="p-6 rounded-2xl border-4" style={{backgroundColor: 'white', borderColor: '#F4A261'}}>
-            <h4 className="font-black mb-4 text-2xl text-center" style={{color: '#264653'}}>🎭 Your HILARIOUS Story! 🎭</h4>
-            <p className="text-xl leading-relaxed font-bold text-center" style={{color: '#264653'}}>
-            {content}
+          <div className="p-6 rounded-xl bg-white border border-gray-300">
+            <h4 className="font-bold mb-4 text-xl md:text-2xl text-center text-gray-900">🎭 Your Hilarious Story! 🎭</h4>
+            <p className="text-lg md:text-xl leading-relaxed font-medium text-center text-gray-900">
+              {content}
             </p>
           </div>
         </div>
