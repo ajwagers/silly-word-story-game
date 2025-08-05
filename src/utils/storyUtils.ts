@@ -12,87 +12,64 @@ export function analyzeStory(text: string): WordToReplace[] {
   
   const allPotentialWords: WordToReplace[] = [];
   
-  // Find nouns
-  doc.nouns().forEach((noun, index) => {
-    const nounText = noun.text();
-    if (nounText.length < 2) return; // Skip very short words
-    
-    let searchStart = 0;
-    let position = text.indexOf(nounText, searchStart);
-    
-    while (position !== -1) {
-      allPotentialWords.push({
-        id: `noun-${index}-${position}`,
-        original: nounText,
-        partOfSpeech: 'noun',
-        index,
-        position
-      });
-      searchStart = position + 1;
-      position = text.indexOf(nounText, searchStart);
-    }
-  });
+  // Get the full document JSON to access precise positions
+  const docJson = doc.json();
   
-  // Find adjectives
-  doc.adjectives().forEach((adj, index) => {
-    const adjText = adj.text();
-    if (adjText.length < 2) return; // Skip very short words
+  // Process each sentence to get precise word positions
+  docJson.forEach((sentence: any, sentenceIndex: number) => {
+    if (!sentence.terms) return;
     
-    let searchStart = 0;
-    let position = text.indexOf(adjText, searchStart);
-    
-    while (position !== -1) {
-      allPotentialWords.push({
-        id: `adjective-${index}-${position}`,
-        original: adjText,
-        partOfSpeech: 'adjective',
-        index,
-        position
-      });
-      searchStart = position + 1;
-      position = text.indexOf(adjText, searchStart);
-    }
-  });
-  
-  // Find verbs
-  doc.verbs().forEach((verb, index) => {
-    const verbText = verb.text();
-    if (verbText.length < 2) return; // Skip very short words
-    
-    let searchStart = 0;
-    let position = text.indexOf(verbText, searchStart);
-    
-    // Determine verb tense
-    const verbJson = verb.json()[0];
-    let tense = 'present'; // default
-    
-    if (verbJson && verbJson.terms && verbJson.terms[0]) {
-      const term = verbJson.terms[0];
-      if (term.tags && term.tags.includes('PastTense')) {
-        tense = 'past';
-      } else if (term.tags && term.tags.includes('PresentTense')) {
-        tense = 'present';
-      } else if (term.tags && term.tags.includes('FutureTense')) {
-        tense = 'future';
-      } else if (term.tags && term.tags.includes('Gerund')) {
-        tense = 'present (ing form)';
-      } else if (term.tags && term.tags.includes('Infinitive')) {
-        tense = 'infinitive';
+    sentence.terms.forEach((term: any, termIndex: number) => {
+      // Skip very short words, punctuation, and common words
+      if (!term.text || term.text.length < 2 || /^[^\w]/.test(term.text)) return;
+      
+      const originalText = term.text;
+      const position = term.offset || 0;
+      
+      // Determine part of speech and tense
+      let partOfSpeech = 'noun'; // default
+      let tense: string | undefined;
+      
+      if (term.tags) {
+        if (term.tags.includes('Noun') || term.tags.includes('ProperNoun')) {
+          partOfSpeech = 'noun';
+        } else if (term.tags.includes('Adjective')) {
+          partOfSpeech = 'adjective';
+        } else if (term.tags.includes('Verb')) {
+          partOfSpeech = 'verb';
+          
+          // Determine verb tense
+          if (term.tags.includes('PastTense')) {
+            tense = 'past';
+          } else if (term.tags.includes('PresentTense')) {
+            tense = 'present';
+          } else if (term.tags.includes('FutureTense')) {
+            tense = 'future';
+          } else if (term.tags.includes('Gerund')) {
+            tense = 'present (ing form)';
+          } else if (term.tags.includes('Infinitive')) {
+            tense = 'infinitive';
+          } else {
+            tense = 'present'; // default for verbs
+          }
+        } else {
+          // Skip words that aren't nouns, adjectives, or verbs
+          return;
+        }
       }
-    }
-    
-    while (position !== -1) {
-      allPotentialWords.push({
-        id: `verb-${index}-${position}`,
-        original: verbText,
-        partOfSpeech: 'verb',
-        tense,
-        index,
-        position
-      });
-      searchStart = position + 1;
-      position = text.indexOf(verbText, searchStart);
-    }
+      
+      // Only include nouns, adjectives, and verbs
+      if (['noun', 'adjective', 'verb'].includes(partOfSpeech)) {
+        allPotentialWords.push({
+          id: `${partOfSpeech}-${sentenceIndex}-${termIndex}-${position}`,
+          original: originalText,
+          partOfSpeech,
+          tense,
+          index: termIndex,
+          position
+        });
+      }
+    });
   });
   
   // Remove duplicates based on position and original text

@@ -36,14 +36,14 @@ export async function getRandomStoryFromDb(): Promise<string> {
     // Try common table and column names for fables/stories
     // Filter stories to 200 words or fewer (approximately 1000 characters)
     const possibleQueries = [
-      "SELECT text FROM stories WHERE LENGTH(text) <= 1000 ORDER BY RANDOM() LIMIT 1",
-      "SELECT content FROM stories WHERE LENGTH(content) <= 1000 ORDER BY RANDOM() LIMIT 1", 
-      "SELECT story FROM stories WHERE LENGTH(story) <= 1000 ORDER BY RANDOM() LIMIT 1",
-      "SELECT text FROM fables WHERE LENGTH(text) <= 1000 ORDER BY RANDOM() LIMIT 1",
-      "SELECT content FROM fables WHERE LENGTH(content) <= 1000 ORDER BY RANDOM() LIMIT 1",
-      "SELECT story FROM fables WHERE LENGTH(story) <= 1000 ORDER BY RANDOM() LIMIT 1",
-      "SELECT text FROM aesop_fables WHERE LENGTH(text) <= 1000 ORDER BY RANDOM() LIMIT 1",
-      "SELECT content FROM aesop_fables WHERE LENGTH(content) <= 1000 ORDER BY RANDOM() LIMIT 1"
+      "SELECT text FROM stories WHERE LENGTH(TRIM(text)) > 50 AND LENGTH(text) <= 1000 AND (LENGTH(text) - LENGTH(REPLACE(text, ' ', '')) + 1) <= 200 ORDER BY RANDOM() LIMIT 1",
+      "SELECT content FROM stories WHERE LENGTH(TRIM(content)) > 50 AND LENGTH(content) <= 1000 AND (LENGTH(content) - LENGTH(REPLACE(content, ' ', '')) + 1) <= 200 ORDER BY RANDOM() LIMIT 1", 
+      "SELECT story FROM stories WHERE LENGTH(TRIM(story)) > 50 AND LENGTH(story) <= 1000 AND (LENGTH(story) - LENGTH(REPLACE(story, ' ', '')) + 1) <= 200 ORDER BY RANDOM() LIMIT 1",
+      "SELECT text FROM fables WHERE LENGTH(TRIM(text)) > 50 AND LENGTH(text) <= 1000 AND (LENGTH(text) - LENGTH(REPLACE(text, ' ', '')) + 1) <= 200 ORDER BY RANDOM() LIMIT 1",
+      "SELECT content FROM fables WHERE LENGTH(TRIM(content)) > 50 AND LENGTH(content) <= 1000 AND (LENGTH(content) - LENGTH(REPLACE(content, ' ', '')) + 1) <= 200 ORDER BY RANDOM() LIMIT 1",
+      "SELECT story FROM fables WHERE LENGTH(TRIM(story)) > 50 AND LENGTH(story) <= 1000 AND (LENGTH(story) - LENGTH(REPLACE(story, ' ', '')) + 1) <= 200 ORDER BY RANDOM() LIMIT 1",
+      "SELECT text FROM aesop_fables WHERE LENGTH(TRIM(text)) > 50 AND LENGTH(text) <= 1000 AND (LENGTH(text) - LENGTH(REPLACE(text, ' ', '')) + 1) <= 200 ORDER BY RANDOM() LIMIT 1",
+      "SELECT content FROM aesop_fables WHERE LENGTH(TRIM(content)) > 50 AND LENGTH(content) <= 1000 AND (LENGTH(content) - LENGTH(REPLACE(content, ' ', '')) + 1) <= 200 ORDER BY RANDOM() LIMIT 1"
     ];
     
     let result = null;
