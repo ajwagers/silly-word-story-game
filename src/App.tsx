@@ -181,6 +181,14 @@ export default function StoryGameApp() {
     
     setCompletedStory(story);
     setGameState(GameState.Completed);
+    
+    // Scroll to the completed story after a brief delay
+    setTimeout(() => {
+      storyRef.current?.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }, 100);
   };
 
   const handleSendMessage = () => {
@@ -226,6 +234,14 @@ export default function StoryGameApp() {
         timestamp: Date.now() + 100,
       };
       setGameState(GameState.Completed);
+      
+      // Scroll to the completed story after a brief delay
+      setTimeout(() => {
+        storyRef.current?.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }, 500);
     }
 
     setChatMessages(prev => [...prev, userMessage, botResponse]);
@@ -239,6 +255,14 @@ export default function StoryGameApp() {
       setHiddenStory(randomStory);
       setIsUsingRandomStory(true);
       setInputText(""); // Clear the visible input
+    
+    // Scroll to the completed story after a brief delay
+    setTimeout(() => {
+      storyRef.current?.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }, 100);
     } catch (error) {
       console.error('Error loading random story:', error);
       alert('Sorry, could not load a random story. Please try again or enter your own story.');
@@ -586,6 +610,7 @@ export default function StoryGameApp() {
                 completedStory={completedStory}
                 staticTemplate={staticTemplate}
                 wordsToReplace={wordsToReplace}
+                interactiveReplacements={interactiveReplacements}
                 displayMode={mode === GameMode.Static ? DisplayMode.Template : DisplayMode.Story}
                 onDownloadPDF={handleDownloadPDF}
                 onShareStory={handleShareStory}

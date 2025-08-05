@@ -12,6 +12,7 @@ interface CompletedStoryProps {
   completedStory?: string;
   staticTemplate?: string;
   wordsToReplace: WordToReplace[];
+  interactiveReplacements?: { [key: string]: string };
   displayMode: DisplayMode;
   onDownloadPDF: () => void;
   onShareStory: () => void;
@@ -23,6 +24,7 @@ const CompletedStory = forwardRef<HTMLDivElement, CompletedStoryProps>(({
   completedStory,
   staticTemplate,
   wordsToReplace,
+  interactiveReplacements = {},
   displayMode,
   onDownloadPDF,
   onShareStory,
@@ -31,6 +33,24 @@ const CompletedStory = forwardRef<HTMLDivElement, CompletedStoryProps>(({
   const isTemplate = displayMode === DisplayMode.Template;
   const content = isTemplate ? staticTemplate : completedStory;
 
+  // Function to highlight replaced words in the story
+  const highlightReplacedWords = (story: string) => {
+    if (!story || isTemplate) return story;
+    
+    let highlightedStory = story;
+    const sortedWords = [...wordsToReplace].sort((a, b) => b.position - a.position);
+    
+    sortedWords.forEach(word => {
+      const replacement = interactiveReplacements[word.id];
+      if (replacement) {
+        const beforeReplacement = highlightedStory.substring(0, word.position);
+        const afterReplacement = highlightedStory.substring(word.position + replacement.length);
+        highlightedStory = beforeReplacement + `<span class="font-bold underline text-blue-600">${replacement}</span>` + afterReplacement;
+      }
+    });
+    
+    return highlightedStory;
+  };
   return (
     <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg p-6 border">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 space-y-4 md:space-y-0">
@@ -76,6 +96,7 @@ const CompletedStory = forwardRef<HTMLDivElement, CompletedStoryProps>(({
                     {index + 1}
                   </span>
                   {word.partOfSpeech.toUpperCase()}
+                  {word.tense && ` (${word.tense.toUpperCase()})`}
                 </li>
               ))}
             </ol>
@@ -99,9 +120,10 @@ const CompletedStory = forwardRef<HTMLDivElement, CompletedStoryProps>(({
         >
           <div className="p-6 rounded-xl bg-white border border-gray-300">
             <h4 className="font-bold mb-4 text-xl md:text-2xl text-center text-gray-900">🎭 Your Hilarious Story! 🎭</h4>
-            <p className="text-lg md:text-xl leading-relaxed font-medium text-center text-gray-900">
-              {content}
-            </p>
+            <div 
+              className="text-lg md:text-xl leading-relaxed font-medium text-center text-gray-900"
+              dangerouslySetInnerHTML={{ __html: highlightReplacedWords(content || '') }}
+            />
           </div>
         </div>
       )}

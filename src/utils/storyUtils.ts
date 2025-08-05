@@ -15,12 +15,14 @@ export function analyzeStory(text: string): WordToReplace[] {
   // Find nouns
   doc.nouns().forEach((noun, index) => {
     const nounText = noun.text();
+    if (nounText.length < 2) return; // Skip very short words
+    
     let searchStart = 0;
     let position = text.indexOf(nounText, searchStart);
     
     while (position !== -1) {
       allPotentialWords.push({
-        id: `noun-${index}`,
+        id: `noun-${index}-${position}`,
         original: nounText,
         partOfSpeech: 'noun',
         index,
@@ -34,12 +36,14 @@ export function analyzeStory(text: string): WordToReplace[] {
   // Find adjectives
   doc.adjectives().forEach((adj, index) => {
     const adjText = adj.text();
+    if (adjText.length < 2) return; // Skip very short words
+    
     let searchStart = 0;
     let position = text.indexOf(adjText, searchStart);
     
     while (position !== -1) {
       allPotentialWords.push({
-        id: `adjective-${index}`,
+        id: `adjective-${index}-${position}`,
         original: adjText,
         partOfSpeech: 'adjective',
         index,
@@ -53,6 +57,8 @@ export function analyzeStory(text: string): WordToReplace[] {
   // Find verbs
   doc.verbs().forEach((verb, index) => {
     const verbText = verb.text();
+    if (verbText.length < 2) return; // Skip very short words
+    
     let searchStart = 0;
     let position = text.indexOf(verbText, searchStart);
     
@@ -77,7 +83,7 @@ export function analyzeStory(text: string): WordToReplace[] {
     
     while (position !== -1) {
       allPotentialWords.push({
-        id: `verb-${index}`,
+        id: `verb-${index}-${position}`,
         original: verbText,
         partOfSpeech: 'verb',
         tense,
@@ -94,7 +100,7 @@ export function analyzeStory(text: string): WordToReplace[] {
     array.findIndex(w => w.position === word.position && w.original === word.original) === index
   );
   
-  // Randomly select words to ensure they're scattered throughout the story
+  // Randomly select target number of words to ensure they're scattered throughout the story
   const shuffledWords = [...uniqueWords].sort(() => Math.random() - 0.5);
   const selectedWords = shuffledWords.slice(0, targetWordsToReplace);
   
