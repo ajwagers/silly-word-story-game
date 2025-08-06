@@ -87,3 +87,11 @@
 .animate-tile-flip {
   animation: tile-flip 0.5s ease-in-out forwards;
 }
+
+.highlight {
+  font-weight: bold;
+  background-color: #ff0000;
+  color: #ffffff;
+  padding: 0.1rem;
+  border-radius: 4px;
+}
