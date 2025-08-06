@@ -170,22 +170,23 @@ export default function StoryGameApp() {
 
   const handleGenerateStory = () => {
     let story = isUsingRandomStory ? hiddenStory : inputText;
-    const sortedWords = [...wordsToReplace].sort((a, b) => b.position - a.position);
-    
+    const sortedWords = [...wordsToReplace].sort((a, b) => a.position - b.position); // Sort words by position in ascending order
+
     sortedWords.forEach(word => {
       const replacement = interactiveReplacements[word.id];
       if (replacement) {
         const highlightedReplacement = `<span class="font-bold underline text-blue-600">${replacement}</span>`;
-        story = story.substring(0, word.position) + highlightedReplacement + story.substring(word.position + word.original.length);
+        story = story.substring(0, word.position) + highlightedReplacement +
+                story.substring(word.position + word.original.length);
       }
     });
-    
+
     setCompletedStory(story);
     setGameState(GameState.Completed);
-    
+
     // Scroll to the completed story after a brief delay
     setTimeout(() => {
-      storyRef.current?.scrollIntoView({ 
+      storyRef.current?.scrollIntoView({
         behavior: 'smooth',
         block: 'start'
       });
