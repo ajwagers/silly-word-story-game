@@ -161,37 +161,12 @@ export default function StoryGameApp() {
     setGameState(GameState.Chatting);
   };
 
-  // Custom word replacement function
-function replaceWords(originalText, replacements) {
-  // Loop through the original text and replace words
-  let newText = originalText.split(' ').map(word => {
-    if (replacements.includes(word)) {
-      // Limit highlighting to original word length
-      return `<span class="highlight">${word}</span>`;
-    } else {
-      return word;
-    }
-  });
-
-  // Return the updated text with replacements
-  return newText.join(' ');
-}
-
-// In the InteractiveModeForm component:
-const handleReplacementChange = (e) => {
-  const replacement = e.target.value;
-  const originalWords = wordsToReplace.split(' ');
-
-  // Update the replacements array
-  setWordsToReplace([replacement, ...wordsToReplace.slice(1)]);
-
-  // Replace the words in the story
-  const newStory = replaceWords(storyText, originalWords);
-
-  // Update the DOM with the new story text
-  setStoryText(newStory);
-};
-
+  const handleReplacementChange = (wordId: string, value: string) => {
+    setInteractiveReplacements(prev => ({
+      ...prev,
+      [wordId]: value
+    }));
+  };
 
   const handleGenerateStory = () => {
   let story = isUsingRandomStory ? hiddenStory : inputText;
