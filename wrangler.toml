@@ -1,0 +1,3 @@
+name = "fill-in-fables"
+compatibility_date = "2025-08-06"
+pages_build_output_dir = "./dist"
