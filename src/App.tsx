@@ -230,12 +230,12 @@ export default function StoryGameApp() {
     setGameState(GameState.Completed);
 
     // Scroll to the completed story after a brief delay
-    setTimeout(() => {
-      storyRef.current?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
-    }, 100);
+    //setTimeout(() => {
+    //  storyRef.current?.scrollIntoView({
+    //    behavior: 'smooth',
+    //    block: 'start'
+    //  });
+    //}, 100);
   };
 
   // Handles the conversation flow in chatbot mode
@@ -309,12 +309,12 @@ export default function StoryGameApp() {
       setGameState(GameState.Completed);
       
       // Scroll to the completed story after a brief delay
-      //setTimeout(() => {
-      //  storyRef.current?.scrollIntoView({ 
-      //    behavior: 'smooth',
-      //    block: 'start'
-      //  });
-      //}, 500);
+      setTimeout(() => {
+        storyRef.current?.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }, 500);
     }
 
     setChatMessages(prev => [...prev, userMessage, botResponse]);
