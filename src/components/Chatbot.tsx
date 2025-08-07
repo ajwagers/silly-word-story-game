@@ -20,13 +20,18 @@ const Chatbot: React.FC<ChatbotProps> = ({
   setUserResponse,
   onSendMessage,
 }) => {
-  const chatEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
-  // This useEffect hook was causing the page to scroll down with every new message.
-  // It's commented out to keep the chat interface stable during the conversation.
-  // useEffect(() => {
-  //   chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  // }, [chatMessages]);
+  useEffect(() => {
+    const chatContainer = chatContainerRef.current;
+    if (chatContainer) {
+      // This more reliable method scrolls the chat container to the bottom
+      // to reveal the latest message, without causing the entire page to scroll.
+      // It does this by setting the vertical scroll position to the total
+      // scrollable height of the container.
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+  }, [chatMessages]);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -44,7 +49,10 @@ const Chatbot: React.FC<ChatbotProps> = ({
       </div>
       
       {/* Chat Messages */}
-      <div className="h-64 md:h-96 overflow-y-auto p-6 space-y-4 bg-gray-50">
+      <div
+        ref={chatContainerRef}
+        className="h-64 md:h-96 overflow-y-auto p-6 space-y-4 bg-gray-50 scroll-smooth"
+      >
         {chatMessages.map((message, index) => (
           <div
             key={index}
@@ -68,7 +76,6 @@ const Chatbot: React.FC<ChatbotProps> = ({
             </div>
           </div>
         ))}
-        <div ref={chatEndRef} />
       </div>
 
       {/* Chat Input */}
