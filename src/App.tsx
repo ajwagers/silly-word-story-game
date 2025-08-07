@@ -230,12 +230,12 @@ export default function StoryGameApp() {
     setGameState(GameState.Completed);
 
     // Scroll to the completed story after a brief delay
-    setTimeout(() => {
-      storyRef.current?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
-    }, 100);
+    //setTimeout(() => {
+    //  storyRef.current?.scrollIntoView({
+    //    behavior: 'smooth',
+    //    block: 'start'
+    //  });
+    //}, 100);
   };
 
   // Handles the conversation flow in chatbot mode
@@ -332,7 +332,7 @@ export default function StoryGameApp() {
     
     // Scroll to the completed story after a brief delay
     setTimeout(() => {
-      storyRef.current?.scrollIntoView({ 
+      storyRef.current?.scrollIntoView({   // This was incorrectly scrolling to storyRef, which is
         behavior: 'smooth',
         block: 'start'
       });
