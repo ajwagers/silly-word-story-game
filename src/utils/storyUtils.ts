@@ -78,7 +78,9 @@ export function analyzeStory(text: string): WordToReplace[] {
   
   // Calculate total words for targetWordsToReplace based on the actual words found
   const totalWords = allPotentialWords.length;
-  const targetWordsToReplace = Math.min(20, Math.max(1, Math.floor(totalWords / 8)));
+  // The logic was selecting ~12.5% (1/8) of words. To increase this by about 30%,
+  // we'll now select ~16.7% (1/6) of the words. 
+  const targetWordsToReplace = Math.min(20, Math.max(1, Math.floor(totalWords / 6)));
 
   // Remove duplicates based on position and original text
   const uniqueWords = allPotentialWords.filter((word, index, array) => 
