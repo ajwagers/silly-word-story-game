@@ -93,6 +93,8 @@ export default function StoryGameApp() {
   const storyRef = useRef<HTMLDivElement>(null);
   const gameSetupRef = useRef<HTMLDivElement>(null);
   const howToPlayRef = useRef<HTMLDivElement>(null);
+  const interactiveFormRef = useRef<HTMLDivElement>(null);
+  const chatbotSectionRef = useRef<HTMLDivElement>(null);
 
   // Background tile animation effect
   useEffect(() => {
@@ -136,6 +138,14 @@ export default function StoryGameApp() {
     const words = analyzeStory(storyToAnalyze);
     setWordsToReplace(words);
     setGameState(GameState.Playing);
+    
+    // Scroll to the interactive form after a brief delay
+    setTimeout(() => {
+      interactiveFormRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }, 100);
   };
 
   // Generates a fill-in-the-blanks style template for static mode
@@ -163,6 +173,14 @@ export default function StoryGameApp() {
     
     setChatMessages([initialMessage]);
     setGameState(GameState.Chatting);
+    
+    // Scroll to center the chatbot window
+    setTimeout(() => {
+      chatbotSectionRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+    }, 100);
   };
 
   // Updates the user's word replacements for interactive mode
@@ -644,7 +662,10 @@ export default function StoryGameApp() {
 
         {/* Game Content Section */}
         {(gameState === GameState.Playing || gameState === GameState.Chatting || gameState === GameState.Completed) && (
-          <section className="max-w-6xl mx-auto px-4 py-8">
+          <section 
+            ref={gameState === GameState.Playing ? interactiveFormRef : gameState === GameState.Chatting ? chatbotSectionRef : undefined}
+            className="max-w-6xl mx-auto px-4 py-8"
+          >
             {gameState === GameState.Playing && mode === GameMode.Interactive && (
               <InteractiveModeForm
                 storyTitle={getStoryTitle()}
