@@ -664,7 +664,7 @@ export default function StoryGameApp() {
         {(gameState === GameState.Playing || gameState === GameState.Chatting || gameState === GameState.Completed) && (
           <section 
             ref={gameState === GameState.Playing ? interactiveFormRef : gameState === GameState.Chatting ? chatbotSectionRef : undefined}
-            className="max-w-6xl mx-auto px-4 py-8"
+            className="max-w-6xl mx-auto px-4 py-8 min-h-[600px]"
           >
             {gameState === GameState.Playing && mode === GameMode.Interactive && (
               <InteractiveModeForm
