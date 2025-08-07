@@ -4,48 +4,42 @@ import jsPDF from 'jspdf';
 import { WordToReplace } from '../components/InteractiveModeForm';
 
 export function analyzeStory(text: string): WordToReplace[] {
-  const doc = nlp(text);
-  
-  // Calculate total words and target number of words to replace
-  const totalWords = text.split(/\s+/).filter(word => word.length > 0).length;
-  const targetWordsToReplace = Math.min(20, Math.max(1, Math.floor(totalWords / 8)));
-  
   const allPotentialWords: WordToReplace[] = [];
   
-  // Find words using a more reliable approach
-  const words = text.split(/\s+/);
-  let currentPosition = 0;
-  
-  words.forEach((word, wordIndex) => {
-    // Find the actual position of this word in the original text
-    const wordStart = text.indexOf(word, currentPosition);
-    if (wordStart === -1) {
-      currentPosition += word.length + 1; // +1 for space
-      return;
+  // Regex to match words (including hyphens/apostrophes) or common punctuation marks
+  // This ensures we capture the exact string from the original text.
+  const wordRegex = /(\b[a-zA-Z'-]+\b|[.,!?;:"'()])/g;
+  let match;
+
+  while ((match = wordRegex.exec(text)) !== null) {
+    const fullMatch = match[0]; // This is the exact substring from the original text (e.g., "creatures,")
+    const wordStart = match.index; // This is the exact start position in the original text
+
+    // If the match is just punctuation, skip it for replacement purposes
+    if (fullMatch.match(/^[.,!?;:"'()]$/)) {
+      continue;
     }
+
+    // Clean the word for NLP analysis (e.g., "creatures" from "creatures,")
+    const cleanWord = fullMatch.replace(/[^\w]/g, '');
     
-    // Clean the word of punctuation for analysis
-    const cleanWord = word.replace(/[^\w]/g, '');
-    
-    // Skip very short words or words that are mostly punctuation
+    // Skip very short words or words that are mostly punctuation after cleaning
     if (cleanWord.length < 3) {
-      currentPosition = wordStart + word.length;
-      return;
+      continue;
     }
-    
-    // Analyze the clean word with compromise
+
+    // Analyze the cleaned word with compromise
     const wordDoc = nlp(cleanWord);
     const wordData = wordDoc.json()[0];
-    
+
     if (!wordData || !wordData.terms || wordData.terms.length === 0) {
-      currentPosition = wordStart + word.length;
-      return;
+      continue;
     }
-    
+
     const term = wordData.terms[0];
-    let partOfSpeech = 'noun'; // default
+    let partOfSpeech = '';
     let tense: string | undefined;
-    
+
     if (term.tags) {
       if (term.tags.includes('Noun') || term.tags.includes('ProperNoun')) {
         partOfSpeech = 'noun';
@@ -53,8 +47,6 @@ export function analyzeStory(text: string): WordToReplace[] {
         partOfSpeech = 'adjective';
       } else if (term.tags.includes('Verb')) {
         partOfSpeech = 'verb';
-        
-        // Determine verb tense
         if (term.tags.includes('PastTense')) {
           tense = 'past';
         } else if (term.tags.includes('PresentTense')) {
@@ -66,40 +58,37 @@ export function analyzeStory(text: string): WordToReplace[] {
         } else if (term.tags.includes('Infinitive')) {
           tense = 'infinitive';
         } else {
-          tense = 'present'; // default for verbs
+          tense = 'present';
         }
-      } else {
-        // Skip words that aren't nouns, adjectives, or verbs
-        currentPosition = wordStart + word.length;
-        return;
       }
     }
-    
-    // Only include nouns, adjectives, and verbs
+
+    // Only include nouns, adjectives, and verbs for replacement
     if (['noun', 'adjective', 'verb'].includes(partOfSpeech)) {
       allPotentialWords.push({
-        id: `${partOfSpeech}-${wordIndex}-${wordStart}`,
-        original: cleanWord,
+        id: `${partOfSpeech}-${wordStart}`, // Use position for a unique ID
+        original: fullMatch, // Store the exact original substring matched by regex
         partOfSpeech,
         tense,
-        index: wordIndex,
+        index: allPotentialWords.length, // Keep a running index for selection
         position: wordStart
       });
     }
-    
-    currentPosition = wordStart + word.length;
-  });
+  }
   
+  // Calculate total words for targetWordsToReplace based on the actual words found
+  const totalWords = allPotentialWords.length;
+  const targetWordsToReplace = Math.min(20, Math.max(1, Math.floor(totalWords / 8)));
+
   // Remove duplicates based on position and original text
   const uniqueWords = allPotentialWords.filter((word, index, array) => 
     array.findIndex(w => w.position === word.position && w.original === word.original) === index
   );
   
-  // Randomly select target number of words to ensure they're scattered throughout the story
+  // Randomly select words and sort them by position
   const shuffledWords = [...uniqueWords].sort(() => Math.random() - 0.5);
   const selectedWords = shuffledWords.slice(0, targetWordsToReplace);
-  
-  // Sort selected words by position in text for proper replacement order
+
   return selectedWords.sort((a, b) => a.position - b.position);
 }
 
