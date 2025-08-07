@@ -181,6 +181,7 @@ export default function StoryGameApp() {
        block: 'center'
      });
     }, 100);
+  };
   // Updates the user's word replacements for interactive mode
   const handleReplacementChange = (wordId: string, value: string) => {
     setInteractiveReplacements(prev => ({
