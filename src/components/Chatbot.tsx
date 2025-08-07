@@ -22,9 +22,11 @@ const Chatbot: React.FC<ChatbotProps> = ({
 }) => {
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [chatMessages]);
+  // This useEffect hook was causing the page to scroll down with every new message.
+  // It's commented out to keep the chat interface stable during the conversation.
+  // useEffect(() => {
+  //   chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  // }, [chatMessages]);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
