@@ -19,11 +19,11 @@ export function analyzeStory(text: string): WordToReplace[] {
   docJson.forEach((sentence: any, sentenceIndex: number) => {
     if (!sentence.terms) return;
     
-    sentence.terms.forEach((term: any, termIndex: number) => {
-      // Skip very short words, punctuation, and common words
-      if (!term.text || term.text.length < 2 || /^[^\w]/.test(term.text)) return;
+    sentence.terms.forEach((term: any, termIndex: number) => {      
+      const originalText = term.text || '';
       
-      const originalText = term.text;
+      // Skip very short words, punctuation, common words, and multi-word phrases.
+      if (originalText.length < 2 || /^[^\w]/.test(originalText) || /\s/.test(originalText)) return;
       const position = term.offset || 0;
       
       // Determine part of speech and tense
@@ -86,15 +86,33 @@ export function analyzeStory(text: string): WordToReplace[] {
 }
 
 export function generateStoryTemplate(originalText: string, words: WordToReplace[]): string {
-  let template = originalText;
-  const sortedWords = [...words].sort((a, b) => b.position - a.position);
-  
-  sortedWords.forEach((word, index) => {
-    const placeholder = `_____${index + 1}_____`;
-    template = template.substring(0, word.position) + placeholder + template.substring(word.position + word.original.length);
+  const newStoryParts: string[] = [];
+  let currentIndex = 0;
+
+  // The 'words' array is already sorted by position from analyzeStory.
+  // We iterate through it to build the new template string piece by piece.
+  // This avoids issues with in-place string modification and overlapping words.
+  words.forEach((word, index) => {
+    // Ensure we don't process a word that overlaps with a previous one.
+    if (word.position >= currentIndex) {
+      // Add the text from the last index up to the current word's position
+      newStoryParts.push(originalText.substring(currentIndex, word.position));
+
+      // Add the placeholder, using the loop index for numbering.
+      const placeholder = `_____${index + 1}_____`;
+      newStoryParts.push(placeholder);
+      
+      // Update the current index to be after the original word that was replaced.
+      currentIndex = word.position + word.original.length;
+    }
   });
-  
-  return template;
+
+  // Add any remaining part of the story after the last replacement.
+  if (currentIndex < originalText.length) {
+    newStoryParts.push(originalText.substring(currentIndex));
+  }
+
+  return newStoryParts.join('');
 }
 
 export async function downloadPDF(content: string, title: string, element: HTMLElement | null) {

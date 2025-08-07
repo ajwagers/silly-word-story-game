@@ -175,25 +175,40 @@ export default function StoryGameApp() {
 
   // Generates the final story by replacing original words with the user's new words.
   function handleGenerateStory() {
-    let story = isUsingRandomStory ? hiddenStory : inputText;
-    // Sort words by position in descending order. This is crucial because it ensures that
-    // replacing a word doesn't change the character index of words that appear earlier in the story.
-    const sortedWords = [...wordsToReplace].sort((a, b) => b.position - a.position);
+    const originalStory = isUsingRandomStory ? hiddenStory : inputText;
+    const newStoryParts: string[] = [];
+    let currentIndex = 0;
 
+    // Sort words by position in ascending order to build the new string sequentially.
+    const sortedWords = [...wordsToReplace].sort((a, b) => a.position - b.position);
+
+    // This robust approach builds the new story from pieces, avoiding errors
+    // from modifying the string while iterating over it. It also gracefully
+    // handles any potential overlapping matches from the analysis step.
     sortedWords.forEach(word => {
       const replacement = interactiveReplacements[word.id];
 
-      if (replacement) {
+      // Ensure we don't process a word that overlaps with a previous one that has already been processed.
+      if (replacement && word.position >= currentIndex) {
+        // Add the text from the last index up to the current word's position
+        newStoryParts.push(originalStory.substring(currentIndex, word.position));
+
         // The replacement is wrapped in HTML to be styled in the final output.
         // The CompletedStory component must render this string as HTML.
         const highlightedReplacement = `<span class="font-bold underline text-blue-600">${replacement}</span>`;
-        story = story.substring(0, word.position) + 
-                highlightedReplacement + 
-                story.substring(word.position + word.original.length);
+        newStoryParts.push(highlightedReplacement);
+        
+        // Update the current index to be after the original word that was replaced.
+        currentIndex = word.position + word.original.length;
       }
     });
 
-    setCompletedStory(story);
+    // Add any remaining part of the story after the last replacement.
+    if (currentIndex < originalStory.length) {
+      newStoryParts.push(originalStory.substring(currentIndex));
+    }
+
+    setCompletedStory(newStoryParts.join(''));
     setGameState(GameState.Completed);
 
     // Scroll to the completed story after a brief delay
