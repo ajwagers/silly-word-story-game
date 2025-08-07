@@ -168,33 +168,34 @@ export default function StoryGameApp() {
     }));
   };
 
-  const handleGenerateStory = () => {
-  let story = isUsingRandomStory ? hiddenStory : inputText;
-  const sortedWords = [...wordsToReplace].sort((a, b) => a.position - b.position); // Sort words by position in ascending order
+  function handleGenerateStory() {
+    let story = isUsingRandomStory ? hiddenStory : inputText;
+    const sortedWords = [...wordsToReplace].sort((a, b) => a.position - b.position); // Sort words by position in ascending order
 
-  for (let i = sortedWords.length - 1; i >= 0; i--) { // Process from end to start
-    const word = sortedWords[i];
-    const replacement = interactiveReplacements[word.id];
+    for (let i = sortedWords.length - 1; i >= 0; i--) { // Process from end to start
+      const word = sortedWords[i];
+      const replacement = interactiveReplacements[word.id];
 
-    if (replacement) {
-      const highlightedReplacement = `<span class="font-bold underline text-blue-600">${replacement}</span>`;
-      story = story.substring(0, word.position) +
-              highlightedReplacement +
-              story.substring(word.position + word.original.length);
+      if (replacement) {
+        const highlightedReplacement = `<span class="font-bold underline text-blue-600">${replacement}</span>`;
+        story = story.substring(0, word.position) +
+                ' ' + highlightedReplacement + ' ' + // Adding spaces around the replacement
+                story.substring(word.position + word.original.length);
+      }
     }
-  }
 
-  setCompletedStory(story);
-  setGameState(GameState.Completed);
+    setCompletedStory(story);
+    setGameState(GameState.Completed);
 
-  // Scroll to the completed story after a brief delay
-  setTimeout(() => {
-    storyRef.current?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start'
-    });
-  }, 100);
-};
+    // Scroll to the completed story after a brief delay
+    setTimeout(() => {
+      storyRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }, 100);
+  };
+
   const handleSendMessage = () => {
     if (!userResponse.trim() || currentWordIndex >= wordsToReplace.length) return;
 
