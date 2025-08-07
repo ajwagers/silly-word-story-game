@@ -250,19 +250,39 @@ export default function StoryGameApp() {
       setCurrentWordIndex(nextIndex);
     } else { 
       // Otherwise, the game is over. Generate the final story.
-      // This logic is similar to handleGenerateStory.
-      let story = isUsingRandomStory ? hiddenStory : inputText;
-      const sortedWords = [...wordsToReplace].sort((a, b) => b.position - a.position);
-      
+      // This robust approach builds the new story from pieces, avoiding errors
+      // from modifying the string while iterating over it.
+      const originalStory = isUsingRandomStory ? hiddenStory : inputText;
+      const newStoryParts: string[] = [];
+      let currentIndex = 0;
+
+      // Sort words by position in ascending order to build the new string sequentially.
+      const sortedWords = [...wordsToReplace].sort((a, b) => a.position - b.position);
+
       sortedWords.forEach(word => {
         const replacement = updatedReplacements[word.id];
-        if (replacement) {
+
+        // Ensure we don't process a word that overlaps with a previous one.
+        if (replacement && word.position >= currentIndex) {
+          // Add the text from the last index up to the current word's position
+          newStoryParts.push(originalStory.substring(currentIndex, word.position));
+
+          // The replacement is wrapped in HTML to be styled in the final output.
           const highlightedReplacement = `<span class="font-bold underline text-blue-600">${replacement}</span>`;
-          story = story.substring(0, word.position) + highlightedReplacement + story.substring(word.position + word.original.length);
+          newStoryParts.push(highlightedReplacement);
+          
+          // Update the current index to be after the original word that was replaced.
+          currentIndex = word.position + word.original.length;
         }
       });
       
-      setCompletedStory(story);
+      // Add any remaining part of the story after the last replacement.
+      if (currentIndex < originalStory.length) {
+        newStoryParts.push(originalStory.substring(currentIndex));
+      }
+      
+      setCompletedStory(newStoryParts.join(''));
+
       botResponse = {
         sender: 'bot',
         text: `🎭 AMAZING! Your hilarious story is ready! Scroll down to see your masterpiece! 🎉`,
