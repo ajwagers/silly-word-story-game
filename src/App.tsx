@@ -195,7 +195,7 @@ export default function StoryGameApp() {
 
         // The replacement is wrapped in HTML to be styled in the final output.
         // The CompletedStory component must render this string as HTML.
-        const highlightedReplacement = `<span class="font-bold underline text-blue-600">${replacement}</span>`;
+        const highlightedReplacement = `<span class="font-bold underline text-blue-600">${replacement.trim()}</span>`;
         newStoryParts.push(highlightedReplacement);
         
         // Update the current index to be after the original word that was replaced.
@@ -268,7 +268,7 @@ export default function StoryGameApp() {
           newStoryParts.push(originalStory.substring(currentIndex, word.position));
 
           // The replacement is wrapped in HTML to be styled in the final output.
-          const highlightedReplacement = `<span class="font-bold underline text-blue-600">${replacement}</span>`;
+          const highlightedReplacement = `<span class="font-bold underline text-blue-600">${replacement.trim()}</span>`;
           newStoryParts.push(highlightedReplacement);
           
           // Update the current index to be after the original word that was replaced.

@@ -12,64 +12,82 @@ export function analyzeStory(text: string): WordToReplace[] {
   
   const allPotentialWords: WordToReplace[] = [];
   
-  // Get the full document JSON to access precise positions
-  const docJson = doc.json();
+  // Find words using a more reliable approach
+  const words = text.split(/\s+/);
+  let currentPosition = 0;
   
-  // Process each sentence to get precise word positions
-  docJson.forEach((sentence: any, sentenceIndex: number) => {
-    if (!sentence.terms) return;
+  words.forEach((word, wordIndex) => {
+    // Find the actual position of this word in the original text
+    const wordStart = text.indexOf(word, currentPosition);
+    if (wordStart === -1) {
+      currentPosition += word.length + 1; // +1 for space
+      return;
+    }
     
-    sentence.terms.forEach((term: any, termIndex: number) => {      
-      const originalText = term.text || '';
-      
-      // Skip very short words, punctuation, common words, and multi-word phrases.
-      if (originalText.length < 2 || /^[^\w]/.test(originalText) || /\s/.test(originalText)) return;
-      const position = term.offset || 0;
-      
-      // Determine part of speech and tense
-      let partOfSpeech = 'noun'; // default
-      let tense: string | undefined;
-      
-      if (term.tags) {
-        if (term.tags.includes('Noun') || term.tags.includes('ProperNoun')) {
-          partOfSpeech = 'noun';
-        } else if (term.tags.includes('Adjective')) {
-          partOfSpeech = 'adjective';
-        } else if (term.tags.includes('Verb')) {
-          partOfSpeech = 'verb';
-          
-          // Determine verb tense
-          if (term.tags.includes('PastTense')) {
-            tense = 'past';
-          } else if (term.tags.includes('PresentTense')) {
-            tense = 'present';
-          } else if (term.tags.includes('FutureTense')) {
-            tense = 'future';
-          } else if (term.tags.includes('Gerund')) {
-            tense = 'present (ing form)';
-          } else if (term.tags.includes('Infinitive')) {
-            tense = 'infinitive';
-          } else {
-            tense = 'present'; // default for verbs
-          }
+    // Clean the word of punctuation for analysis
+    const cleanWord = word.replace(/[^\w]/g, '');
+    
+    // Skip very short words or words that are mostly punctuation
+    if (cleanWord.length < 3) {
+      currentPosition = wordStart + word.length;
+      return;
+    }
+    
+    // Analyze the clean word with compromise
+    const wordDoc = nlp(cleanWord);
+    const wordData = wordDoc.json()[0];
+    
+    if (!wordData || !wordData.terms || wordData.terms.length === 0) {
+      currentPosition = wordStart + word.length;
+      return;
+    }
+    
+    const term = wordData.terms[0];
+    let partOfSpeech = 'noun'; // default
+    let tense: string | undefined;
+    
+    if (term.tags) {
+      if (term.tags.includes('Noun') || term.tags.includes('ProperNoun')) {
+        partOfSpeech = 'noun';
+      } else if (term.tags.includes('Adjective')) {
+        partOfSpeech = 'adjective';
+      } else if (term.tags.includes('Verb')) {
+        partOfSpeech = 'verb';
+        
+        // Determine verb tense
+        if (term.tags.includes('PastTense')) {
+          tense = 'past';
+        } else if (term.tags.includes('PresentTense')) {
+          tense = 'present';
+        } else if (term.tags.includes('FutureTense')) {
+          tense = 'future';
+        } else if (term.tags.includes('Gerund')) {
+          tense = 'present (ing form)';
+        } else if (term.tags.includes('Infinitive')) {
+          tense = 'infinitive';
         } else {
-          // Skip words that aren't nouns, adjectives, or verbs
-          return;
+          tense = 'present'; // default for verbs
         }
+      } else {
+        // Skip words that aren't nouns, adjectives, or verbs
+        currentPosition = wordStart + word.length;
+        return;
       }
-      
-      // Only include nouns, adjectives, and verbs
-      if (['noun', 'adjective', 'verb'].includes(partOfSpeech)) {
-        allPotentialWords.push({
-          id: `${partOfSpeech}-${sentenceIndex}-${termIndex}-${position}`,
-          original: originalText,
-          partOfSpeech,
-          tense,
-          index: termIndex,
-          position
-        });
-      }
-    });
+    }
+    
+    // Only include nouns, adjectives, and verbs
+    if (['noun', 'adjective', 'verb'].includes(partOfSpeech)) {
+      allPotentialWords.push({
+        id: `${partOfSpeech}-${wordIndex}-${wordStart}`,
+        original: cleanWord,
+        partOfSpeech,
+        tense,
+        index: wordIndex,
+        position: wordStart
+      });
+    }
+    
+    currentPosition = wordStart + word.length;
   });
   
   // Remove duplicates based on position and original text
