@@ -334,12 +334,13 @@ export default function StoryGameApp() {
       setInputText(""); // Clear the visible input
     
     // Scroll to the completed story after a brief delay
-    setTimeout(() => {
-      storyRef.current?.scrollIntoView({   // This was incorrectly scrolling to storyRef, which is
-        behavior: 'smooth',
-        block: 'start'
-      });
-    }, 100);
+    //4
+    // setTimeout(() => {
+    //  storyRef.current?.scrollIntoView({   // This was incorrectly scrolling to storyRef, which is
+    //    behavior: 'smooth',
+    //    block: 'start'
+    //  });
+    //}, 100);
     } catch (error) {
       console.error('Error loading random story:', error);
       alert('Sorry, could not load a random story. Please try again or enter your own story.');
