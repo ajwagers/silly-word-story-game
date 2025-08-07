@@ -72,21 +72,22 @@ export enum GameState {
 }
 
 export default function StoryGameApp() {
+  // State management for the entire application
   const [gameState, setGameState] = useState<GameState>(GameState.Setup);
   const [mode, setMode] = useState<GameMode>(GameMode.Interactive);
   const [inputText, setInputText] = useState("");
   const [wordsToReplace, setWordsToReplace] = useState<WordToReplace[]>([]);
   const [interactiveReplacements, setInteractiveReplacements] = useState<{ [key: string]: string }>({});
-  const [completedStory, setCompletedStory] = useState("");
+  const [completedStory, setCompletedStory] = useState(""); // Holds the final story with HTML for highlighting
   const [staticTemplate, setStaticTemplate] = useState("");
-  const [hiddenStory, setHiddenStory] = useState("");
+  const [hiddenStory, setHiddenStory] = useState(""); // Stores the story when 'Load Random' is used
   const [isUsingRandomStory, setIsUsingRandomStory] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [userResponse, setUserResponse] = useState("");
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoadingStory, setIsLoadingStory] = useState(false);
-  const [mosaicTiles, setMosaicTiles] = useState(() => generateMosaicTiles());
+  const [mosaicTiles, setMosaicTiles] = useState(generateMosaicTiles);
   const [animatingTileId, setAnimatingTileId] = useState<number | null>(null);
   
   const storyRef = useRef<HTMLDivElement>(null);
@@ -129,6 +130,7 @@ export default function StoryGameApp() {
     };
   }, [mosaicTiles.length]);
 
+  // Analyzes the story to find words for interactive mode
   const handleAnalyze = () => {
     const storyToAnalyze = isUsingRandomStory ? hiddenStory : inputText;
     const words = analyzeStory(storyToAnalyze);
@@ -136,6 +138,7 @@ export default function StoryGameApp() {
     setGameState(GameState.Playing);
   };
 
+  // Generates a fill-in-the-blanks style template for static mode
   const handleGenerateTemplate = () => {
     const storyToAnalyze = isUsingRandomStory ? hiddenStory : inputText;
     const words = analyzeStory(storyToAnalyze);
@@ -145,6 +148,7 @@ export default function StoryGameApp() {
     setGameState(GameState.Completed);
   };
 
+  // Initializes the chatbot mode with a welcome message
   const handleStartChatbot = () => {
     const storyToAnalyze = isUsingRandomStory ? hiddenStory : inputText;
     const words = analyzeStory(storyToAnalyze);
@@ -161,6 +165,7 @@ export default function StoryGameApp() {
     setGameState(GameState.Chatting);
   };
 
+  // Updates the user's word replacements for interactive mode
   const handleReplacementChange = (wordId: string, value: string) => {
     setInteractiveReplacements(prev => ({
       ...prev,
@@ -168,21 +173,25 @@ export default function StoryGameApp() {
     }));
   };
 
+  // Generates the final story by replacing original words with the user's new words.
   function handleGenerateStory() {
     let story = isUsingRandomStory ? hiddenStory : inputText;
-    const sortedWords = [...wordsToReplace].sort((a, b) => a.position - b.position); // Sort words by position in ascending order
+    // Sort words by position in descending order. This is crucial because it ensures that
+    // replacing a word doesn't change the character index of words that appear earlier in the story.
+    const sortedWords = [...wordsToReplace].sort((a, b) => b.position - a.position);
 
-    for (let i = sortedWords.length - 1; i >= 0; i--) { // Process from end to start
-      const word = sortedWords[i];
+    sortedWords.forEach(word => {
       const replacement = interactiveReplacements[word.id];
 
       if (replacement) {
+        // The replacement is wrapped in HTML to be styled in the final output.
+        // The CompletedStory component must render this string as HTML.
         const highlightedReplacement = `<span class="font-bold underline text-blue-600">${replacement}</span>`;
-        story = story.substring(0, word.position) +
-                ' ' + highlightedReplacement + ' ' + // Adding spaces around the replacement
+        story = story.substring(0, word.position) + 
+                highlightedReplacement + 
                 story.substring(word.position + word.original.length);
       }
-    }
+    });
 
     setCompletedStory(story);
     setGameState(GameState.Completed);
@@ -196,6 +205,7 @@ export default function StoryGameApp() {
     }, 100);
   };
 
+  // Handles the conversation flow in chatbot mode
   const handleSendMessage = () => {
     if (!userResponse.trim() || currentWordIndex >= wordsToReplace.length) return;
 
@@ -205,6 +215,7 @@ export default function StoryGameApp() {
       timestamp: Date.now(),
     };
 
+    // Store the user's word
     const updatedReplacements = {
       ...interactiveReplacements,
       [wordsToReplace[currentWordIndex].id]: userResponse
@@ -214,6 +225,7 @@ export default function StoryGameApp() {
     const nextIndex = currentWordIndex + 1;
     let botResponse: ChatMessage;
 
+    // If there are more words to replace, ask for the next one
     if (nextIndex < wordsToReplace.length) {
       botResponse = {
         sender: 'bot',
@@ -221,7 +233,9 @@ export default function StoryGameApp() {
         timestamp: Date.now() + 100,
       };
       setCurrentWordIndex(nextIndex);
-    } else {
+    } else { 
+      // Otherwise, the game is over. Generate the final story.
+      // This logic is similar to handleGenerateStory.
       let story = isUsingRandomStory ? hiddenStory : inputText;
       const sortedWords = [...wordsToReplace].sort((a, b) => b.position - a.position);
       
@@ -254,6 +268,7 @@ export default function StoryGameApp() {
     setUserResponse("");
   };
 
+  // Fetches a random story from the database utils
   const handleLoadRandomStory = async () => {
     setIsLoadingStory(true);
     try {
@@ -277,16 +292,19 @@ export default function StoryGameApp() {
     }
   };
 
+  // Triggers the PDF download utility
   const handleDownloadPDF = () => {
     const content = gameState === GameState.Completed && mode === GameMode.Static ? staticTemplate : completedStory;
     const title = mode === GameMode.Static ? "Story Template" : "Silly Story";
     downloadPDF(content, title, storyRef.current);
   };
 
+  // Triggers the Web Share API utility
   const handleShareStory = () => {
     shareStory(completedStory);
   };
 
+  // Resets all state to their initial values to start a new game
   const handleReset = () => {
     setGameState(GameState.Setup);
     setInputText("");
@@ -302,6 +320,7 @@ export default function StoryGameApp() {
     setMobileMenuOpen(false);
   };
 
+  // Helper functions for smooth scrolling to different sections
   const scrollToGameSetup = () => {
     gameSetupRef.current?.scrollIntoView({ 
       behavior: 'smooth',
@@ -318,6 +337,7 @@ export default function StoryGameApp() {
     setMobileMenuOpen(false);
   };
   
+  // Gets a dynamic title for the story based on the current game mode
   const getStoryTitle = () => {
     switch (mode) {
       case GameMode.Interactive:
