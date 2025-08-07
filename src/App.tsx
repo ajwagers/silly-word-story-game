@@ -182,6 +182,7 @@ export default function StoryGameApp() {
      });
     }, 100);
   };
+
   // Updates the user's word replacements for interactive mode
   const handleReplacementChange = (wordId: string, value: string) => {
     setInteractiveReplacements(prev => ({
@@ -229,12 +230,13 @@ export default function StoryGameApp() {
     setGameState(GameState.Completed);
 
     // Scroll to the completed story after a brief delay
-    setTimeout(() => {
-      storyRef.current?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
-    }, 100);
+    //1
+    //setTimeout(() => {
+    //  storyRef.current?.scrollIntoView({
+    //    behavior: 'smooth',
+    //    block: 'start'
+    //  });
+    //}, 100);
   };
 
   // Handles the conversation flow in chatbot mode
@@ -308,12 +310,13 @@ export default function StoryGameApp() {
       setGameState(GameState.Completed);
       
       // Scroll to the completed story after a brief delay
-       setTimeout(() => {
-        storyRef.current?.scrollIntoView({ 
-          behavior: 'smooth',
-          block: 'start'
-        });
-      }, 500);
+      //2
+      // setTimeout(() => {
+      //  storyRef.current?.scrollIntoView({ 
+      //    behavior: 'smooth',
+      //    block: 'start'
+      //  });
+      //}, 500);
     }
 
     setChatMessages(prev => [...prev, userMessage, botResponse]);
@@ -330,12 +333,13 @@ export default function StoryGameApp() {
       setInputText(""); // Clear the visible input
     
     // Scroll to the completed story after a brief delay
-    setTimeout(() => {
-      storyRef.current?.scrollIntoView({   // This was incorrectly scrolling to storyRef, which is
-        behavior: 'smooth',
-        block: 'start'
-      });
-    }, 100);
+    //4
+    // setTimeout(() => {
+    //  storyRef.current?.scrollIntoView({   // This was incorrectly scrolling to storyRef, which is
+    //    behavior: 'smooth',
+    //    block: 'start'
+    //  });
+    //}, 100);
     } catch (error) {
       console.error('Error loading random story:', error);
       alert('Sorry, could not load a random story. Please try again or enter your own story.');
@@ -591,7 +595,7 @@ export default function StoryGameApp() {
                     className="flex-1 px-4 py-3 rounded-xl font-bold text-base border-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 bg-purple-600 border-purple-600 text-white hover:bg-purple-700 hover:border-purple-700 transition-all duration-200"
                   >
                     <Sparkles className="w-5 h-5" />
-                    {isLoadingStory ? 'Loading...' : 'Load Random Story'}
+                    {isLoadingStory ? 'Loading...' : 'Load Random Aesop Fable'}
                   </button>
                   
                   {inputText.trim() && (

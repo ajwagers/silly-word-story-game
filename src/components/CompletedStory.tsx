@@ -109,6 +109,17 @@ const CompletedStory = forwardRef<HTMLDivElement, CompletedStoryProps>(({
           </div>
         </div>
       )}
+
+      {/* Additional Reset Button */}
+      <div className="mt-8 text-center">
+        <button
+          onClick={onReset}
+          className="inline-flex items-center justify-center gap-3 bg-black text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors shadow-lg"
+        >
+          <RefreshCw className="w-5 h-5" />
+          Lets do it again!
+        </button>
+      </div>
     </div>
   );
 });

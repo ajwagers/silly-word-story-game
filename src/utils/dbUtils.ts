@@ -88,7 +88,7 @@ export async function getRandomStoryFromDb(): Promise<string> {
     return result as string;
     
   } catch (error) {
-    console.error('Error fetching random story:', error);
+    console.error('Error fetching random fable:', error);
     throw error;
   }
 }
