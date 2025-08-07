@@ -175,12 +175,13 @@ export default function StoryGameApp() {
     setGameState(GameState.Chatting);
     
     // Scroll to center the chatbot window
-    setTimeout(() => {
-      chatbotSectionRef.current?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
-      });
-    }, 100);
+    //3
+    // setTimeout(() => {
+    //  chatbotSectionRef.current?.scrollIntoView({
+    //    behavior: 'smooth',
+    //    block: 'center'
+    //  });
+    //}, 100);
   };
 
   // Updates the user's word replacements for interactive mode
@@ -230,6 +231,7 @@ export default function StoryGameApp() {
     setGameState(GameState.Completed);
 
     // Scroll to the completed story after a brief delay
+    //1
     //setTimeout(() => {
     //  storyRef.current?.scrollIntoView({
     //    behavior: 'smooth',
@@ -309,12 +311,13 @@ export default function StoryGameApp() {
       setGameState(GameState.Completed);
       
       // Scroll to the completed story after a brief delay
-      setTimeout(() => {
-        storyRef.current?.scrollIntoView({ 
-          behavior: 'smooth',
-          block: 'start'
-        });
-      }, 500);
+      //2
+      // setTimeout(() => {
+      //  storyRef.current?.scrollIntoView({ 
+      //    behavior: 'smooth',
+      //    block: 'start'
+      //  });
+      //}, 500);
     }
 
     setChatMessages(prev => [...prev, userMessage, botResponse]);
