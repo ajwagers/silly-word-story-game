@@ -409,25 +409,37 @@ export default function StoryGameApp() {
     setSubscriptionMessage("");
 
     try {
-      const response = await fetch('/api/mailchimp-subscribe', {
+      // Check if we have Supabase environment variables
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      
+      if (!supabaseUrl) {
+        setSubscriptionMessage("Newsletter signup is not configured yet. Please connect to Supabase first!");
+        return;
+      }
+
+      const response = await fetch(`${supabaseUrl}/functions/v1/mailchimp-subscribe`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
         },
         body: JSON.stringify({ email: email.trim() }),
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        setSubscriptionMessage("🎉 Thanks for subscribing! Check your email for confirmation.");
-        setEmail("");
-      } else {
-        setSubscriptionMessage(data.error || "Something went wrong. Please try again.");
+      if (!response.ok) {
+        if (response.status === 405) {
+          setSubscriptionMessage("Newsletter service is not properly configured. Please set up Mailchimp integration.");
+          return;
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+
+      const data = await response.json();
+      setSubscriptionMessage("🎉 Thanks for subscribing! Check your email for confirmation.");
+      setEmail("");
     } catch (error) {
       console.error('Newsletter subscription error:', error);
-      setSubscriptionMessage("Network error. Please check your connection and try again.");
+      setSubscriptionMessage("Newsletter signup is not available yet. Please connect to Supabase and configure Mailchimp first!");
     } finally {
       setIsSubscribing(false);
     }
