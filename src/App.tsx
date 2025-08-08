@@ -89,6 +89,9 @@ export default function StoryGameApp() {
   const [isLoadingStory, setIsLoadingStory] = useState(false);
   const [mosaicTiles, setMosaicTiles] = useState(generateMosaicTiles);
   const [animatingTileId, setAnimatingTileId] = useState<number | null>(null);
+  const [email, setEmail] = useState("");
+  const [isSubscribing, setIsSubscribing] = useState(false);
+  const [subscriptionMessage, setSubscriptionMessage] = useState("");
   
   const storyRef = useRef<HTMLDivElement>(null);
   const gameSetupRef = useRef<HTMLDivElement>(null);
@@ -393,6 +396,43 @@ export default function StoryGameApp() {
     setMobileMenuOpen(false);
   };
   
+  // Handles newsletter subscription
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email.trim()) {
+      setSubscriptionMessage("Please enter a valid email address");
+      return;
+    }
+
+    setIsSubscribing(true);
+    setSubscriptionMessage("");
+
+    try {
+      const response = await fetch('/api/mailchimp-subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: email.trim() }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSubscriptionMessage("🎉 Thanks for subscribing! Check your email for confirmation.");
+        setEmail("");
+      } else {
+        setSubscriptionMessage(data.error || "Something went wrong. Please try again.");
+      }
+    } catch (error) {
+      console.error('Newsletter subscription error:', error);
+      setSubscriptionMessage("Network error. Please check your connection and try again.");
+    } finally {
+      setIsSubscribing(false);
+    }
+  };
+
   // Gets a dynamic title for the story based on the current game mode
   const getStoryTitle = () => {
     switch (mode) {
@@ -737,16 +777,32 @@ export default function StoryGameApp() {
             <p className="text-lg text-gray-700 mb-8">
               Keep up on what is new, discover new story ideas, and collect creative writing tips.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-              <input
-                type="email"
-                placeholder="Email address"
-                className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
-              />
-              <button className="bg-black text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors">
-                SIGN UP
-              </button>
-            </div>
+            <form onSubmit={handleNewsletterSubmit} className="max-w-md mx-auto">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Email address"
+                  disabled={isSubscribing}
+                  className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all disabled:opacity-50"
+                />
+                <button 
+                  type="submit"
+                  disabled={isSubscribing || !email.trim()}
+                  className="bg-black text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSubscribing ? 'SIGNING UP...' : 'SIGN UP'}
+                </button>
+              </div>
+              {subscriptionMessage && (
+                <p className={`mt-4 text-center font-medium ${
+                  subscriptionMessage.includes('🎉') ? 'text-green-700' : 'text-red-600'
+                }`}>
+                  {subscriptionMessage}
+                </p>
+              )}
+            </form>
           </div>
         </section>
       </div>
