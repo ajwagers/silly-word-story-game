@@ -715,7 +715,7 @@ export default function StoryGameApp() {
                 </AccordionTrigger>
                 <AccordionContent className="space-y-3 text-gray-700">
                   <ol className="list-decimal list-inside space-y-2">
-                    <li>Write or paste a story in the text area</li>
+                    <li>Write or paste a story in the text area, or let us randomly select a fable for you.</li>
                     <li>Choose your preferred game mode</li>
                     <li>Let AI find the perfect words to replace</li>
                     <li>Add your wacky replacements</li>
