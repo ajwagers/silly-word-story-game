@@ -124,7 +124,10 @@ export default function StoryGameApp() {
             auth: {
               detectSessionInUrl: false,
               persistSession: false,
-              autoRefreshToken: false
+              autoRefreshToken: false,
+              storage: undefined,
+              storageKey: undefined,
+              flowType: 'implicit'
             }
           });
           
