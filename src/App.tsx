@@ -487,7 +487,17 @@ export default function StoryGameApp() {
           setSubscriptionMessage("Newsletter service is not properly configured. Please set up Mailchimp integration.");
           return;
         }
-        throw new Error(`HTTP error! status: ${response.status}`);
+        
+        // Parse the response body to get the specific error message
+        try {
+          const errorData = await response.json();
+          const errorMessage = errorData.error || errorData.message || `HTTP error! status: ${response.status}`;
+          setSubscriptionMessage(errorMessage);
+          return;
+        } catch (parseError) {
+          setSubscriptionMessage(`HTTP error! status: ${response.status}`);
+          return;
+        }
       }
 
       const data = await response.json();
