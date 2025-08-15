@@ -118,33 +118,44 @@ export default function StoryGameApp() {
           return;
         }
         
-        // Initialize Supabase client
-        const supabase = createClient(supabaseUrl, supabaseAnonKey);
-        
-        // Test connection with a simple query (this will fail if table doesn't exist, but that's expected)
-        const { data, error } = await supabase
-          .from('test_connection')
-          .select('*')
-          .limit(1);
-        
-        // If we get a "relation does not exist" error, that means we connected successfully
-        // but the table doesn't exist (which is expected)
-        if (error && error.message.includes('relation "test_connection" does not exist')) {
-          setSupabaseConnectionStatus("✅ Connected Successfully");
-          console.log('✅ Supabase connection successful! (Table not found is expected)');
-        } else if (error && error.message.includes('Invalid API key')) {
-          setSupabaseConnectionStatus("❌ Invalid API Key");
-          console.log('❌ Supabase connection failed: Invalid API key');
-        } else if (error) {
-          setSupabaseConnectionStatus(`❌ Connection Error: ${error.message}`);
-          console.log('❌ Supabase connection error:', error);
-        } else {
-          setSupabaseConnectionStatus("✅ Connected Successfully");
-          console.log('✅ Supabase connection successful!', data);
+        try {
+          // Initialize Supabase client
+          const supabase = createClient(supabaseUrl, supabaseAnonKey);
+          
+          // Test connection with a simple query (this will fail if table doesn't exist, but that's expected)
+          const { data, error } = await supabase
+            .from('test_connection')
+            .select('*')
+            .limit(1);
+          
+          // If we get a "relation does not exist" error, that means we connected successfully
+          // but the table doesn't exist (which is expected)
+          if (error && error.message.includes('relation "test_connection" does not exist')) {
+            setSupabaseConnectionStatus("✅ Connected Successfully");
+            console.log('✅ Supabase connection successful! (Table not found is expected)');
+          } else if (error && error.message.includes('Invalid API key')) {
+            setSupabaseConnectionStatus("❌ Invalid API Key");
+            console.log('❌ Supabase connection failed: Invalid API key');
+          } else if (error) {
+            setSupabaseConnectionStatus(`❌ Connection Error: ${error.message}`);
+            console.log('❌ Supabase connection error:', error);
+          } else {
+            setSupabaseConnectionStatus("✅ Connected Successfully");
+            console.log('✅ Supabase connection successful!', data);
+          }
+        } catch (networkError) {
+          // Handle network errors like "Failed to fetch"
+          if (networkError instanceof TypeError && networkError.message.includes('Failed to fetch')) {
+            setSupabaseConnectionStatus("❌ Network Error - Check Supabase URL");
+            console.log('❌ Supabase connection failed: Network error (Failed to fetch). Please verify your VITE_SUPABASE_URL is correct and complete.');
+          } else {
+            setSupabaseConnectionStatus(`❌ Connection Failed: ${networkError}`);
+            console.log('❌ Supabase connection test failed:', networkError);
+          }
         }
         
       } catch (error) {
-        setSupabaseConnectionStatus(`❌ Connection Failed: ${error}`);
+        setSupabaseConnectionStatus("❌ Connection Test Failed");
         console.error('❌ Supabase connection test failed:', error);
       }
     };
