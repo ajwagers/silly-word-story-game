@@ -12,6 +12,7 @@ import {
   Menu,
   X,
 } from "lucide-react";
+import { createClient } from '@supabase/supabase-js';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -92,6 +93,7 @@ export default function StoryGameApp() {
   const [email, setEmail] = useState("");
   const [isSubscribing, setIsSubscribing] = useState(false);
   const [subscriptionMessage, setSubscriptionMessage] = useState("");
+  const [supabaseConnectionStatus, setSupabaseConnectionStatus] = useState<string>("Testing...");
   
   const storyRef = useRef<HTMLDivElement>(null);
   const gameSetupRef = useRef<HTMLDivElement>(null);
@@ -99,6 +101,56 @@ export default function StoryGameApp() {
   const interactiveFormRef = useRef<HTMLDivElement>(null);
   const chatbotSectionRef = useRef<HTMLDivElement>(null);
 
+  // Test Supabase connection on component mount
+  useEffect(() => {
+    const testSupabaseConnection = async () => {
+      try {
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+        
+        console.log('🔍 Testing Supabase connection...');
+        console.log('Supabase URL:', supabaseUrl ? '✅ Present' : '❌ Missing');
+        console.log('Supabase Anon Key:', supabaseAnonKey ? '✅ Present' : '❌ Missing');
+        
+        if (!supabaseUrl || !supabaseAnonKey) {
+          setSupabaseConnectionStatus("❌ Not Connected - Missing environment variables");
+          console.log('❌ Supabase connection failed: Missing environment variables');
+          return;
+        }
+        
+        // Initialize Supabase client
+        const supabase = createClient(supabaseUrl, supabaseAnonKey);
+        
+        // Test connection with a simple query (this will fail if table doesn't exist, but that's expected)
+        const { data, error } = await supabase
+          .from('test_connection')
+          .select('*')
+          .limit(1);
+        
+        // If we get a "relation does not exist" error, that means we connected successfully
+        // but the table doesn't exist (which is expected)
+        if (error && error.message.includes('relation "test_connection" does not exist')) {
+          setSupabaseConnectionStatus("✅ Connected Successfully");
+          console.log('✅ Supabase connection successful! (Table not found is expected)');
+        } else if (error && error.message.includes('Invalid API key')) {
+          setSupabaseConnectionStatus("❌ Invalid API Key");
+          console.log('❌ Supabase connection failed: Invalid API key');
+        } else if (error) {
+          setSupabaseConnectionStatus(`❌ Connection Error: ${error.message}`);
+          console.log('❌ Supabase connection error:', error);
+        } else {
+          setSupabaseConnectionStatus("✅ Connected Successfully");
+          console.log('✅ Supabase connection successful!', data);
+        }
+        
+      } catch (error) {
+        setSupabaseConnectionStatus(`❌ Connection Failed: ${error}`);
+        console.error('❌ Supabase connection test failed:', error);
+      }
+    };
+    
+    testSupabaseConnection();
+  }, []);
   // Background tile animation effect
   useEffect(() => {
     const animationInterval = setInterval(() => {
@@ -505,6 +557,10 @@ export default function StoryGameApp() {
                 >
                   GET HELP
                 </button>
+                {/* Supabase Connection Status */}
+                <div className="text-sm font-medium text-gray-600">
+                  {supabaseConnectionStatus}
+                </div>
               </div>
 
               {/* Mobile menu button */}
@@ -537,6 +593,10 @@ export default function StoryGameApp() {
               >
                 GET HELP
               </button>
+              {/* Supabase Connection Status for Mobile */}
+              <div className="text-sm font-medium text-gray-600 pt-2 border-t">
+                Supabase: {supabaseConnectionStatus}
+              </div>
             </div>
           )}
         </nav>
