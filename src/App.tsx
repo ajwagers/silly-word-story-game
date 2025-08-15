@@ -120,7 +120,13 @@ export default function StoryGameApp() {
         
         try {
           // Initialize Supabase client
-          const supabase = createClient(supabaseUrl, supabaseAnonKey);
+          const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+            auth: {
+              detectSessionInUrl: false,
+              persistSession: false,
+              autoRefreshToken: false
+            }
+          });
           
           // Test connection by checking auth status - this avoids 404 errors
           const { data, error } = await supabase.auth.getSession();
