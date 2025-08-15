@@ -122,26 +122,19 @@ export default function StoryGameApp() {
           // Initialize Supabase client
           const supabase = createClient(supabaseUrl, supabaseAnonKey);
           
-          // Test connection with a simple query (this will fail if table doesn't exist, but that's expected)
-          const { data, error } = await supabase
-            .from('test_connection')
-            .select('*')
-            .limit(1);
+          // Test connection by checking auth status - this avoids 404 errors
+          const { data, error } = await supabase.auth.getSession();
           
-          // If we get a "relation does not exist" error, that means we connected successfully
-          // but the table doesn't exist (which is expected)
-          if (error && error.message.includes('relation "test_connection" does not exist')) {
+          // If we can get session data (even if null), connection is successful
+          if (!error) {
             setSupabaseConnectionStatus("✅ Connected Successfully");
-            console.log('✅ Supabase connection successful! (Table not found is expected)');
-          } else if (error && error.message.includes('Invalid API key')) {
+            console.log('✅ Supabase connection successful!', data);
+          } else if (error.message && error.message.includes('Invalid API key')) {
             setSupabaseConnectionStatus("❌ Invalid API Key");
             console.log('❌ Supabase connection failed: Invalid API key');
           } else if (error) {
             setSupabaseConnectionStatus(`❌ Connection Error: ${error.message}`);
             console.log('❌ Supabase connection error:', error);
-          } else {
-            setSupabaseConnectionStatus("✅ Connected Successfully");
-            console.log('✅ Supabase connection successful!', data);
           }
         } catch (networkError) {
           // Handle network errors like "Failed to fetch"
