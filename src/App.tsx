@@ -93,7 +93,6 @@ export default function StoryGameApp() {
   const [email, setEmail] = useState("");
   const [isSubscribing, setIsSubscribing] = useState(false);
   const [subscriptionMessage, setSubscriptionMessage] = useState("");
-  const [supabaseConnectionStatus, setSupabaseConnectionStatus] = useState<string>("Testing...");
   
   const storyRef = useRef<HTMLDivElement>(null);
   const gameSetupRef = useRef<HTMLDivElement>(null);
@@ -101,70 +100,6 @@ export default function StoryGameApp() {
   const interactiveFormRef = useRef<HTMLDivElement>(null);
   const chatbotSectionRef = useRef<HTMLDivElement>(null);
 
-  // Test Supabase connection on component mount
-  useEffect(() => {
-    const testSupabaseConnection = async () => {
-      try {
-        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-        const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-        
-        console.log('🔍 Testing Supabase connection...');
-        console.log('Supabase URL:', supabaseUrl ? '✅ Present' : '❌ Missing');
-        console.log('Supabase Anon Key:', supabaseAnonKey ? '✅ Present' : '❌ Missing');
-        
-        if (!supabaseUrl || !supabaseAnonKey) {
-          setSupabaseConnectionStatus("❌ Not Connected - Missing environment variables");
-          console.log('❌ Supabase connection failed: Missing environment variables');
-          return;
-        }
-        
-        try {
-          // Initialize Supabase client
-          const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-            auth: {
-              providers: [],
-              detectSessionInUrl: false,
-              persistSession: false,
-              autoRefreshToken: false,
-              storage: undefined,
-              storageKey: undefined,
-              flowType: 'implicit'
-            }
-          });
-          
-          // Test connection by checking auth status - this avoids 404 errors
-          const { data, error } = await supabase.auth.getSession();
-          
-          // If we can get session data (even if null), connection is successful
-          if (!error) {
-            setSupabaseConnectionStatus("✅ Connected Successfully");
-            console.log('✅ Supabase connection successful!', data);
-          } else if (error.message && error.message.includes('Invalid API key')) {
-            setSupabaseConnectionStatus("❌ Invalid API Key");
-            console.log('❌ Supabase connection failed: Invalid API key');
-          } else if (error) {
-            setSupabaseConnectionStatus(`❌ Connection Error: ${error.message}`);
-            console.log('❌ Supabase connection error:', error);
-          }
-        } catch (networkError) {
-          // Handle network errors like "Failed to fetch"
-          if (networkError instanceof TypeError && networkError.message.includes('Failed to fetch')) {
-            setSupabaseConnectionStatus("❌ Network Error - Check Supabase URL");
-            console.log('❌ Supabase connection failed: Network error (Failed to fetch). Please verify your VITE_SUPABASE_URL is correct and complete.');
-          } else {
-            setSupabaseConnectionStatus(`❌ Connection Failed: ${networkError}`);
-            console.log('❌ Supabase connection test failed:', networkError);
-          }
-        }
-        
-      } catch (error) {
-        setSupabaseConnectionStatus("❌ Connection Test Failed");
-        console.error('❌ Supabase connection test failed:', error);
-      }
-    };
-    
-    testSupabaseConnection();
-  }, []);
   // Background tile animation effect
   useEffect(() => {
     const animationInterval = setInterval(() => {
@@ -581,10 +516,6 @@ export default function StoryGameApp() {
                 >
                   GET HELP
                 </button>
-                {/* Supabase Connection Status */}
-                <div className="text-sm font-medium text-gray-600">
-                  {supabaseConnectionStatus}
-                </div>
               </div>
 
               {/* Mobile menu button */}
@@ -617,10 +548,6 @@ export default function StoryGameApp() {
               >
                 GET HELP
               </button>
-              {/* Supabase Connection Status for Mobile */}
-              <div className="text-sm font-medium text-gray-600 pt-2 border-t">
-                Supabase: {supabaseConnectionStatus}
-              </div>
             </div>
           )}
         </nav>
