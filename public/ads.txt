@@ -3,7 +3,7 @@
 # Your publisher ID should look like: pub-1234567890123456
 # You can find this in your Google AdSense account dashboard
 
-google.com, YOUR_PUBLISHER_ID, DIRECT, f08c47fec0942fa0
+google.com, pub-1807492004820117, DIRECT, f08c47fec0942fa0
 
 # Additional ad networks can be added below if needed
 # Format: domain.com, publisher_id, relationship_type, certification_authority_id
