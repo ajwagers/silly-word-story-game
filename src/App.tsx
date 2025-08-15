@@ -122,6 +122,7 @@ export default function StoryGameApp() {
           // Initialize Supabase client
           const supabase = createClient(supabaseUrl, supabaseAnonKey, {
             auth: {
+              providers: [],
               detectSessionInUrl: false,
               persistSession: false,
               autoRefreshToken: false,
