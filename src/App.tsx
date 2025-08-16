@@ -786,7 +786,7 @@ export default function StoryGameApp() {
         {/* How to Play Section - Always Visible */}
         <section ref={howToPlayRef} className="max-w-6xl mx-auto px-4 py-8">
           <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg p-6 border">
-            <Accordion type="single" collapsible>
+            <Accordion type="single" collapsible defaultValue="how">
               <AccordionItem value="how">
                 <AccordionTrigger className="text-xl font-bold text-gray-900 hover:text-gray-700">
                   How to Play This Game
