@@ -99,6 +99,7 @@ export default function StoryGameApp() {
   const howToPlayRef = useRef<HTMLDivElement>(null);
   const interactiveFormRef = useRef<HTMLDivElement>(null);
   const chatbotSectionRef = useRef<HTMLDivElement>(null);
+  const newsletterRef = useRef<HTMLDivElement>(null);
 
   // Background tile animation effect
   useEffect(() => {
@@ -397,6 +398,14 @@ export default function StoryGameApp() {
     setMobileMenuOpen(false);
   };
   
+  const scrollToNewsletter = () => {
+    newsletterRef.current?.scrollIntoView({ 
+      behavior: 'smooth',
+      block: 'start'
+    });
+    setMobileMenuOpen(false);
+  };
+  
   // Handles newsletter subscription
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -507,7 +516,10 @@ export default function StoryGameApp() {
                 >
                   MAKE STORIES
                 </button>
-                <button className="text-gray-600 hover:text-gray-900 font-medium transition-colors">
+                <button 
+                  onClick={scrollToNewsletter}
+                  className="text-gray-600 hover:text-gray-900 font-medium transition-colors"
+                >
                   ABOUT US
                 </button>
                 <button 
@@ -539,7 +551,10 @@ export default function StoryGameApp() {
               >
                 MAKE STORIES
               </button>
-              <button className="block w-full text-left text-gray-600 hover:text-gray-900 font-medium transition-colors">
+              <button 
+                onClick={scrollToNewsletter}
+                className="block w-full text-left text-gray-600 hover:text-gray-900 font-medium transition-colors"
+              >
                 ABOUT US
               </button>
               <button 
@@ -791,7 +806,7 @@ export default function StoryGameApp() {
         </section>
 
         {/* Newsletter Section - Always Visible */}
-        <section className="bg-yellow-200/95 backdrop-blur-sm py-16">
+        <section ref={newsletterRef} className="bg-yellow-200/95 backdrop-blur-sm py-16">
           <div className="max-w-4xl mx-auto text-center px-4">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
               SIGN UP FOR OUR IRREGULAR NEWSLETTER <br />
