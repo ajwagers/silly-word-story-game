@@ -29,6 +29,7 @@ import InteractiveModeForm, { WordToReplace } from "./components/InteractiveMode
 import CompletedStory, { DisplayMode } from "./components/CompletedStory";
 import Chatbot, { ChatMessage } from "./components/Chatbot";
 import { analyzeStory, generateStoryTemplate, downloadPDF, shareStory } from "./utils/storyUtils";
+import WordTips from "./components/WordTips";
 import { getRandomStoryFromDb } from "./utils/dbUtils";
 
 // Generate mosaic tiles data
@@ -801,6 +802,9 @@ export default function StoryGameApp() {
             </Accordion>
           </div>
         </section>
+
+        {/* Word Tips Section */}
+        <WordTips />
 
         {/* Newsletter Section - Always Visible */}
         <section ref={newsletterRef} className="bg-yellow-200/95 backdrop-blur-sm py-16">
