@@ -48,17 +48,17 @@ export function analyzeStory(text: string): WordToReplace[] {
       } else if (term.tags.includes('Verb')) {
         partOfSpeech = 'verb';
         if (term.tags.includes('PastTense')) {
-          tense = 'past';
+          tense = 'past tense';
         } else if (term.tags.includes('PresentTense')) {
-          tense = 'present';
+          tense = 'present tense';
         } else if (term.tags.includes('FutureTense')) {
           tense = 'future';
         } else if (term.tags.includes('Gerund')) {
-          tense = 'present (ing form)';
+          tense = 'ending in -ing';
         } else if (term.tags.includes('Infinitive')) {
           tense = 'infinitive';
         } else {
-          tense = 'present';
+          tense = 'present tense';
         }
       }
     }

@@ -235,13 +235,12 @@ export default function StoryGameApp() {
     setGameState(GameState.Completed);
 
     // Scroll to the completed story after a brief delay
-    //1
-    //setTimeout(() => {
-    //  storyRef.current?.scrollIntoView({
-    //    behavior: 'smooth',
-    //    block: 'start'
-    //  });
-    //}, 100);
+    setTimeout(() => {
+      storyRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }, 100);
   };
 
   // Handles the conversation flow in chatbot mode
@@ -315,13 +314,12 @@ export default function StoryGameApp() {
       setGameState(GameState.Completed);
       
       // Scroll to the completed story after a brief delay
-      //2
-      // setTimeout(() => {
-      //  storyRef.current?.scrollIntoView({ 
-      //    behavior: 'smooth',
-      //    block: 'start'
-      //  });
-      //}, 500);
+      setTimeout(() => {
+       storyRef.current?.scrollIntoView({ 
+         behavior: 'smooth',
+         block: 'start'
+       });
+      }, 500);
     }
 
     setChatMessages(prev => [...prev, userMessage, botResponse]);
@@ -336,15 +334,14 @@ export default function StoryGameApp() {
       setHiddenStory(randomStory);
       setIsUsingRandomStory(true);
       setInputText(""); // Clear the visible input
-    
-    // Scroll to the completed story after a brief delay
-    //4
-    // setTimeout(() => {
-    //  storyRef.current?.scrollIntoView({   // This was incorrectly scrolling to storyRef, which is
-    //    behavior: 'smooth',
-    //    block: 'start'
-    //  });
-    //}, 100);
+
+      // Scroll to the game setup section so the user can choose a mode.
+      setTimeout(() => {
+        gameSetupRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }, 100);
     } catch (error) {
       console.error('Error loading random story:', error);
       alert('Sorry, could not load a random story. Please try again or enter your own story.');
