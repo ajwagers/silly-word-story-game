@@ -29,7 +29,7 @@ import InteractiveModeForm, { WordToReplace } from "./components/InteractiveMode
 import CompletedStory, { DisplayMode } from "./components/CompletedStory";
 import Chatbot, { ChatMessage } from "./components/Chatbot";
 import { analyzeStory, generateStoryTemplate, downloadPDF, shareStory, buildCompletedStory } from "./utils/storyUtils";
-import AboutUs from "./components/AboutUs";
+import InfoSection from "./components/InfoSection";
 import WordTips from "./components/WordTips";
 import { getRandomStoryFromDb } from "./utils/dbUtils";
 
@@ -764,8 +764,8 @@ export default function StoryGameApp() {
         {/* Word Tips Section */}
         <WordTips />
 
-        {/* About Us Section */}
-        <AboutUs ref={aboutUsRef} />
+        {/* Info Section (About, Privacy, ToS) */}
+        <InfoSection ref={aboutUsRef} />
 
         {/* Newsletter Section - Always Visible */}
         <section ref={newsletterRef} className="bg-yellow-200/95 backdrop-blur-sm py-16">
