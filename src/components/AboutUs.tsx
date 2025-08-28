@@ -35,7 +35,7 @@ const AboutUs = forwardRef<HTMLElement>((_props, ref) => {
               </p>
               <h4 className="text-lg font-bold text-gray-800 pt-2">Who We Are</h4>
               <p>
-                Fill-in-Fables was created by <strong className="text-purple-600">[Your Name]</strong>, a storyteller and software developer who loves word games, learning through play, and building tools that spark imagination. We also welcome community contributions — from teachers, parents, and anyone who enjoys a good laugh while learning.
+                Fill-in-Fables was created by <strong className="text-purple-600">Andy J. Wagers, PhD</strong>, a storyteller and programmer who loves word games, learning through play, and building tools that spark imagination. We also welcome community contributions — from teachers, parents, and anyone who enjoys a good laugh while learning.
               </p>
               <p>
                 So whether you’re here to write the <strong className="text-pink-600">funny adjective</strong> <strong className="text-blue-600">animal</strong> who went to <strong className="text-green-600">place</strong>, or you’re a parent/teacher looking for a creative language-learning tool, you’re in the right spot.
