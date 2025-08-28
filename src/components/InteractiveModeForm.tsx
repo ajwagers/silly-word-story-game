@@ -47,8 +47,8 @@ const InteractiveModeForm: React.FC<InteractiveModeFormProps> = ({
           // Construct the key for the definitions map.
           // This handles cases like 'verb (past tense)' by looking up 'verb (past tense)' first,
           // and falling back to just 'verb' if the specific tense isn't defined.
-          const definitionKey = word.tense ? `${word.partOfSpeech} (${word.tense})` : word.partOfSpeech;
-          const definition = wordTypeDefinitions[definitionKey.toLowerCase()] || wordTypeDefinitions[word.partOfSpeech.toLowerCase()] || 'A type of word.';
+          const definitionKey = word.tense ? `${word.partOfSpeech} (${word.tense})` : word.partOfSpeech; // Keys are already lowercase
+          const definition = wordTypeDefinitions[definitionKey] || wordTypeDefinitions[word.partOfSpeech] || 'A type of word.';
           
           const capitalizedWordType = capitalize(word.partOfSpeech);
 

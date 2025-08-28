@@ -1,43 +1,29 @@
 import { useState, useEffect } from 'react';
 import { Lightbulb } from 'lucide-react';
+import { wordTypeDefinitions, capitalize } from '../utils/wordDefinitions';
 
-const tips = [
-  {
-    title: 'Adverbs',
-    content: 'Adverbs describe verbs, adjectives, or other adverbs. They often end in "-ly" (like "quickly" or "slowly").',
-    color: 'bg-blue-100',
-    textColor: 'text-blue-800',
-    iconColor: 'text-blue-500',
-  },
-  {
-    title: 'Proper Nouns',
-    content: 'A proper noun is the specific name of a person, place, or organization. Always capitalize them! (e.g., "Samantha", "New York").',
-    color: 'bg-green-100',
-    textColor: 'text-green-800',
-    iconColor: 'text-green-500',
-  },
-  {
-    title: 'Verbs',
-    content: 'Verbs are action words! They tell you what the subject of a sentence is doing (e.g., "run", "jump", "think").',
-    color: 'bg-yellow-100',
-    textColor: 'text-yellow-800',
-    iconColor: 'text-yellow-500',
-  },
-  {
-    title: 'Nouns',
-    content: 'A noun is a word for a person, place, thing, or idea (e.g., "cat", "house", "happiness").',
-    color: 'bg-purple-100',
-    textColor: 'text-purple-800',
-    iconColor: 'text-purple-500',
-  },
-  {
-    title: 'Adjectives',
-    content: 'Adjectives are describing words. They tell you more about a noun (e.g., "happy" dog, "tall" building).',
-    color: 'bg-pink-100',
-    textColor: 'text-pink-800',
-    iconColor: 'text-pink-500',
-  },
+// Define a color palette for the tips to cycle through
+const tipColors = [
+  { color: 'bg-blue-100', textColor: 'text-blue-800', iconColor: 'text-blue-500' },
+  { color: 'bg-green-100', textColor: 'text-green-800', iconColor: 'text-green-500' },
+  { color: 'bg-yellow-100', textColor: 'text-yellow-800', iconColor: 'text-yellow-500' },
+  { color: 'bg-purple-100', textColor: 'text-purple-800', iconColor: 'text-purple-500' },
+  { color: 'bg-pink-100', textColor: 'text-pink-800', iconColor: 'text-pink-500' },
+  { color: 'bg-indigo-100', textColor: 'text-indigo-800', iconColor: 'text-indigo-500' },
+  { color: 'bg-red-100', textColor: 'text-red-800', iconColor: 'text-red-500' },
+  { color: 'bg-teal-100', textColor: 'text-teal-800', iconColor: 'text-teal-500' },
 ];
+
+// Generate tips dynamically from the definitions file, ensuring all are included
+const tips = Object.entries(wordTypeDefinitions).map(([key, content], index) => {
+  const title = capitalize(key);
+  const colors = tipColors[index % tipColors.length];
+  return {
+    title,
+    content,
+    ...colors,
+  };
+});
 
 const WordTips = () => {
   const [currentTipIndex, setCurrentTipIndex] = useState(0);

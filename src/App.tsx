@@ -28,7 +28,7 @@ import GameSetup from "./components/GameSetup";
 import InteractiveModeForm, { WordToReplace } from "./components/InteractiveModeForm";
 import CompletedStory, { DisplayMode } from "./components/CompletedStory";
 import Chatbot, { ChatMessage } from "./components/Chatbot";
-import { analyzeStory, generateStoryTemplate, downloadPDF, shareStory } from "./utils/storyUtils";
+import { analyzeStory, generateStoryTemplate, downloadPDF, shareStory, buildCompletedStory } from "./utils/storyUtils";
 import AboutUs from "./components/AboutUs";
 import WordTips from "./components/WordTips";
 import { getRandomStoryFromDb } from "./utils/dbUtils";
@@ -176,9 +176,12 @@ export default function StoryGameApp() {
     setWordsToReplace(words);
     setCurrentWordIndex(0);
     
+    const firstWord = words[0];
+    const firstWordType = firstWord ? `${firstWord.partOfSpeech}${firstWord.tense ? ` (${firstWord.tense})` : ''}` : 'word';
+
     const initialMessage: ChatMessage = {
       sender: 'bot',
-      text: `🎭 Welcome to your silly story adventure! I found ${words.length} words we can make hilarious! Let's start with the first one: I need a silly ${words[0]?.partOfSpeech}!`,
+      text: `🎭 Welcome to your silly story adventure! I found ${words.length} words we can make hilarious! Let's start with the first one: I need a silly ${firstWordType}!`,
       timestamp: Date.now(),
     };
     
@@ -205,39 +208,8 @@ export default function StoryGameApp() {
   // Generates the final story by replacing original words with the user's new words.
   function handleGenerateStory() {
     const originalStory = isUsingRandomStory ? hiddenStory : inputText;
-    const newStoryParts: string[] = [];
-    let currentIndex = 0;
-
-    // Sort words by position in ascending order to build the new string sequentially.
-    const sortedWords = [...wordsToReplace].sort((a, b) => a.position - b.position);
-
-    // This robust approach builds the new story from pieces, avoiding errors
-    // from modifying the string while iterating over it. It also gracefully
-    // handles any potential overlapping matches from the analysis step.
-    sortedWords.forEach(word => {
-      const replacement = interactiveReplacements[word.id];
-
-      // Ensure we don't process a word that overlaps with a previous one that has already been processed.
-      if (replacement && word.position >= currentIndex) {
-        // Add the text from the last index up to the current word's position
-        newStoryParts.push(originalStory.substring(currentIndex, word.position));
-
-        // The replacement is wrapped in HTML to be styled in the final output.
-        // The CompletedStory component must render this string as HTML.
-        const highlightedReplacement = `<span class="font-bold underline text-blue-600">${replacement.trim()}</span>`;
-        newStoryParts.push(highlightedReplacement);
-        
-        // Update the current index to be after the original word that was replaced.
-        currentIndex = word.position + word.original.length;
-      }
-    });
-
-    // Add any remaining part of the story after the last replacement.
-    if (currentIndex < originalStory.length) {
-      newStoryParts.push(originalStory.substring(currentIndex));
-    }
-
-    setCompletedStory(newStoryParts.join(''));
+    const finalStory = buildCompletedStory(originalStory, wordsToReplace, interactiveReplacements);
+    setCompletedStory(finalStory);
     setGameState(GameState.Completed);
 
     // Scroll to the completed story after a brief delay
@@ -271,46 +243,19 @@ export default function StoryGameApp() {
 
     // If there are more words to replace, ask for the next one
     if (nextIndex < wordsToReplace.length) {
+      const nextWord = wordsToReplace[nextIndex];
+      const nextWordType = `${nextWord.partOfSpeech}${nextWord.tense ? ` (${nextWord.tense})` : ''}`;
       botResponse = {
         sender: 'bot',
-        text: `🎉 Great choice! Now I need a silly ${wordsToReplace[nextIndex].partOfSpeech}!`,
+        text: `🎉 Great choice! Now I need a silly ${nextWordType}!`,
         timestamp: Date.now() + 100,
       };
       setCurrentWordIndex(nextIndex);
     } else { 
       // Otherwise, the game is over. Generate the final story.
-      // This robust approach builds the new story from pieces, avoiding errors
-      // from modifying the string while iterating over it.
       const originalStory = isUsingRandomStory ? hiddenStory : inputText;
-      const newStoryParts: string[] = [];
-      let currentIndex = 0;
-
-      // Sort words by position in ascending order to build the new string sequentially.
-      const sortedWords = [...wordsToReplace].sort((a, b) => a.position - b.position);
-
-      sortedWords.forEach(word => {
-        const replacement = updatedReplacements[word.id];
-
-        // Ensure we don't process a word that overlaps with a previous one.
-        if (replacement && word.position >= currentIndex) {
-          // Add the text from the last index up to the current word's position
-          newStoryParts.push(originalStory.substring(currentIndex, word.position));
-
-          // The replacement is wrapped in HTML to be styled in the final output.
-          const highlightedReplacement = `<span class="font-bold underline text-blue-600">${replacement.trim()}</span>`;
-          newStoryParts.push(highlightedReplacement);
-          
-          // Update the current index to be after the original word that was replaced.
-          currentIndex = word.position + word.original.length;
-        }
-      });
-      
-      // Add any remaining part of the story after the last replacement.
-      if (currentIndex < originalStory.length) {
-        newStoryParts.push(originalStory.substring(currentIndex));
-      }
-      
-      setCompletedStory(newStoryParts.join(''));
+      const finalStory = buildCompletedStory(originalStory, wordsToReplace, updatedReplacements);
+      setCompletedStory(finalStory);
 
       botResponse = {
         sender: 'bot',
@@ -816,11 +761,11 @@ export default function StoryGameApp() {
           </div>
         </section>
 
-        {/* About Us Section */}
-        <AboutUs ref={aboutUsRef} />
-
         {/* Word Tips Section */}
         <WordTips />
+
+        {/* About Us Section */}
+        <AboutUs ref={aboutUsRef} />
 
         {/* Newsletter Section - Always Visible */}
         <section ref={newsletterRef} className="bg-yellow-200/95 backdrop-blur-sm py-16">

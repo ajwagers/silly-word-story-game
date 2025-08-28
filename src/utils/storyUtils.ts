@@ -43,6 +43,8 @@ export function analyzeStory(text: string): WordToReplace[] {
     if (term.tags) {
       if (term.tags.includes('Noun') || term.tags.includes('ProperNoun')) {
         partOfSpeech = 'noun';
+      } else if (term.tags.includes('Adverb')) {
+        partOfSpeech = 'adverb';
       } else if (term.tags.includes('Adjective')) {
         partOfSpeech = 'adjective';
       } else if (term.tags.includes('Verb')) {
@@ -63,8 +65,8 @@ export function analyzeStory(text: string): WordToReplace[] {
       }
     }
 
-    // Only include nouns, adjectives, and verbs for replacement
-    if (['noun', 'adjective', 'verb'].includes(partOfSpeech)) {
+    // Only include specified parts of speech for replacement
+    if (['noun', 'adjective', 'verb', 'adverb'].includes(partOfSpeech)) {
       allPotentialWords.push({
         id: `${partOfSpeech}-${wordStart}`, // Use position for a unique ID
         original: fullMatch, // Store the exact original substring matched by regex
@@ -78,20 +80,83 @@ export function analyzeStory(text: string): WordToReplace[] {
   
   // Calculate total words for targetWordsToReplace based on the actual words found
   const totalWords = allPotentialWords.length;
-  // The logic was selecting ~12.5% (1/8) of words. To increase this by about 30%,
-  // we'll now select ~16.7% (1/6) of the words. 
-  const targetWordsToReplace = Math.min(20, Math.max(1, Math.floor(totalWords / 6)));
+  // We'll select ~25% (1/4) of the words, with a max of 25, to make the game more active.
+  const targetWordsToReplace = Math.min(25, Math.max(1, Math.floor(totalWords / 4)));
 
   // Remove duplicates based on position and original text
   const uniqueWords = allPotentialWords.filter((word, index, array) => 
     array.findIndex(w => w.position === word.position && w.original === word.original) === index
   );
   
-  // Randomly select words and sort them by position
-  const shuffledWords = [...uniqueWords].sort(() => Math.random() - 0.5);
-  const selectedWords = shuffledWords.slice(0, targetWordsToReplace);
+  // --- New selection logic to ensure variety ---
+  const wordsByType = uniqueWords.reduce((acc, word) => {
+    const type = word.partOfSpeech;
+    if (!acc[type]) {
+      acc[type] = [];
+    }
+    acc[type].push(word);
+    return acc;
+  }, {} as Record<string, WordToReplace[]>);
+
+  // Shuffle each group of words
+  for (const type in wordsByType) {
+    wordsByType[type] = wordsByType[type].sort(() => Math.random() - 0.5);
+  }
+
+  const selectedWords: WordToReplace[] = [];
+  const types = Object.keys(wordsByType);
+  let typeIndex = 0;
+
+  // Pick one word from each type cyclically until we reach the target
+  while (selectedWords.length < targetWordsToReplace && selectedWords.length < uniqueWords.length) {
+    const currentType = types[typeIndex % types.length];
+    const word = wordsByType[currentType]?.shift(); // Take the first (randomized) word
+    if (word) {
+      selectedWords.push(word);
+    }
+    typeIndex++;
+  }
 
   return selectedWords.sort((a, b) => a.position - b.position);
+}
+
+export function buildCompletedStory(
+  originalStory: string,
+  wordsToReplace: WordToReplace[],
+  replacements: { [key: string]: string }
+): string {
+  const newStoryParts: string[] = [];
+  let currentIndex = 0;
+
+  // Sort words by position in ascending order to build the new string sequentially.
+  const sortedWords = [...wordsToReplace].sort((a, b) => a.position - b.position);
+
+  // This robust approach builds the new story from pieces, avoiding errors
+  // from modifying the string while iterating over it. It also gracefully
+  // handles any potential overlapping matches from the analysis step.
+  sortedWords.forEach(word => {
+    const replacement = replacements[word.id];
+
+    // Ensure we don't process a word that overlaps with a previous one that has already been processed.
+    if (replacement && word.position >= currentIndex) {
+      // Add the text from the last index up to the current word's position
+      newStoryParts.push(originalStory.substring(currentIndex, word.position));
+
+      // The replacement is wrapped in HTML to be styled in the final output.
+      const highlightedReplacement = `<span class="font-bold underline text-blue-600">${replacement.trim()}</span>`;
+      newStoryParts.push(highlightedReplacement);
+      
+      // Update the current index to be after the original word that was replaced.
+      currentIndex = word.position + word.original.length;
+    }
+  });
+
+  // Add any remaining part of the story after the last replacement.
+  if (currentIndex < originalStory.length) {
+    newStoryParts.push(originalStory.substring(currentIndex));
+  }
+
+  return newStoryParts.join('');
 }
 
 export function generateStoryTemplate(originalText: string, words: WordToReplace[]): string {
