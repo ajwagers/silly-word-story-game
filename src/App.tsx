@@ -29,6 +29,7 @@ import InteractiveModeForm, { WordToReplace } from "./components/InteractiveMode
 import CompletedStory, { DisplayMode } from "./components/CompletedStory";
 import Chatbot, { ChatMessage } from "./components/Chatbot";
 import { analyzeStory, generateStoryTemplate, downloadPDF, shareStory } from "./utils/storyUtils";
+import AboutUs from "./components/AboutUs";
 import WordTips from "./components/WordTips";
 import { getRandomStoryFromDb } from "./utils/dbUtils";
 
@@ -103,6 +104,7 @@ export default function StoryGameApp() {
   const howToPlayRef = useRef<HTMLDivElement>(null);
   const interactiveFormRef = useRef<HTMLDivElement>(null);
   const chatbotSectionRef = useRef<HTMLDivElement>(null);
+  const aboutUsRef = useRef<HTMLElement>(null);
   const newsletterRef = useRef<HTMLDivElement>(null);
 
   // Background tile animation effect
@@ -399,6 +401,14 @@ export default function StoryGameApp() {
     setMobileMenuOpen(false);
   };
   
+  const scrollToAboutUs = () => {
+    aboutUsRef.current?.scrollIntoView({ 
+      behavior: 'smooth',
+      block: 'start'
+    });
+    setMobileMenuOpen(false);
+  };
+  
   const scrollToNewsletter = () => {
     newsletterRef.current?.scrollIntoView({ 
       behavior: 'smooth',
@@ -518,7 +528,7 @@ export default function StoryGameApp() {
                   MAKE STORIES
                 </button>
                 <button 
-                  onClick={scrollToNewsletter}
+                  onClick={scrollToAboutUs}
                   className="text-gray-600 hover:text-gray-900 font-medium transition-colors"
                 >
                   ABOUT US
@@ -553,7 +563,7 @@ export default function StoryGameApp() {
                 MAKE STORIES
               </button>
               <button 
-                onClick={scrollToNewsletter}
+                onClick={scrollToAboutUs}
                 className="block w-full text-left text-gray-600 hover:text-gray-900 font-medium transition-colors"
               >
                 ABOUT US
@@ -805,6 +815,9 @@ export default function StoryGameApp() {
             </Accordion>
           </div>
         </section>
+
+        {/* About Us Section */}
+        <AboutUs ref={aboutUsRef} />
 
         {/* Word Tips Section */}
         <WordTips />
