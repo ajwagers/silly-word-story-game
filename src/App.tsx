@@ -587,8 +587,14 @@ export default function StoryGameApp() {
         <section ref={gameSetupRef} className="max-w-6xl mx-auto px-4 py-8">
           <div className="space-y-8">
             {/* Mode Selection */}
-            <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg p-6 border">
-              <h3 className="text-xl font-bold text-gray-900 mb-6 text-center">Choose Your Adventure</h3>
+            <div className={`bg-white/95 backdrop-blur-sm rounded-xl shadow-lg p-6 border transition-all duration-300 ${
+              isUsingRandomStory && gameState === GameState.Setup ? 'ring-2 ring-blue-400 shadow-blue-100' : ''
+            }`}>
+              <h3 className={`text-xl font-bold mb-6 text-center transition-colors duration-300 ${
+                isUsingRandomStory && gameState === GameState.Setup ? 'text-blue-700' : 'text-gray-900'
+              }`}>
+                {isUsingRandomStory && gameState === GameState.Setup ? '👆 Choose Your Adventure (Story Loaded!)' : 'Choose Your Adventure'}
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <button
                   onClick={() => setMode(GameMode.Interactive)}
@@ -700,11 +706,17 @@ export default function StoryGameApp() {
                 <div className="flex flex-col sm:flex-row gap-3">
                   <button
                     onClick={handleLoadRandomStory}
-                    disabled={isLoadingStory || selectedStoryPacks.length === 0}
-                    className="flex-1 px-4 py-3 rounded-xl font-bold text-base border-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 bg-purple-600 border-purple-600 text-white hover:bg-purple-700 hover:border-purple-700 transition-all duration-200"
+                    disabled={isLoadingStory || selectedStoryPacks.length === 0 || (isUsingRandomStory && gameState === GameState.Setup)}
+                    className={`flex-1 px-4 py-3 rounded-xl font-bold text-base border-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all duration-200 ${
+                      isUsingRandomStory && gameState === GameState.Setup
+                        ? 'bg-gray-400 border-gray-400 text-gray-300'
+                        : 'bg-purple-600 border-purple-600 text-white hover:bg-purple-700 hover:border-purple-700'
+                    }`}
                   >
                     <Sparkles className="w-5 h-5" />
-                    {isLoadingStory ? 'Loading...' : `Load Random Story (${selectedStoryPacks.length > 1 ? 'Mixed' : selectedStoryPacks.includes('aesop') ? 'Aesop' : 'Mother Goose'})`}
+                    {isLoadingStory ? 'Loading...' : 
+                     isUsingRandomStory && gameState === GameState.Setup ? '✓ Story Loaded - Choose Mode Below' :
+                     `Load Random Story (${selectedStoryPacks.length > 1 ? 'Mixed' : selectedStoryPacks.includes('aesop') ? 'Aesop' : 'Mother Goose'})`}
                   </button>
                   
                   <button
@@ -747,10 +759,14 @@ export default function StoryGameApp() {
                     <button
                       onClick={handleAnalyze}
                       disabled={!inputText.trim() && !isUsingRandomStory}
-                      className="w-full px-6 py-4 rounded-xl font-bold text-lg border-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 bg-blue-600 border-blue-600 text-white hover:bg-blue-700 hover:border-blue-700 transition-all duration-200"
+                      className={`w-full px-6 py-4 rounded-xl font-bold text-lg border-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all duration-200 ${
+                        isUsingRandomStory && gameState === GameState.Setup
+                          ? 'bg-blue-600 border-blue-600 text-white hover:bg-blue-700 hover:border-blue-700 ring-2 ring-blue-300 shadow-lg animate-pulse'
+                          : 'bg-blue-600 border-blue-600 text-white hover:bg-blue-700 hover:border-blue-700'
+                      }`}
                     >
                       <FileText className="w-5 h-5" />
-                      Find Words to Replace
+                      {isUsingRandomStory && gameState === GameState.Setup ? '👇 Find Words to Replace' : 'Find Words to Replace'}
                     </button>
                   )}
                   
@@ -758,10 +774,14 @@ export default function StoryGameApp() {
                     <button
                       onClick={handleGenerateTemplate}
                       disabled={!inputText.trim() && !isUsingRandomStory}
-                      className="w-full px-6 py-4 rounded-xl font-bold text-lg border-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 bg-orange-600 border-orange-600 text-white hover:bg-orange-700 hover:border-orange-700 transition-all duration-200"
+                      className={`w-full px-6 py-4 rounded-xl font-bold text-lg border-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all duration-200 ${
+                        isUsingRandomStory && gameState === GameState.Setup
+                          ? 'bg-orange-600 border-orange-600 text-white hover:bg-orange-700 hover:border-orange-700 ring-2 ring-orange-300 shadow-lg animate-pulse'
+                          : 'bg-orange-600 border-orange-600 text-white hover:bg-orange-700 hover:border-orange-700'
+                      }`}
                     >
                       <FileText className="w-5 h-5" />
-                      Generate Template
+                      {isUsingRandomStory && gameState === GameState.Setup ? '👇 Generate Template' : 'Generate Template'}
                     </button>
                   )}
                   
@@ -769,10 +789,14 @@ export default function StoryGameApp() {
                     <button
                       onClick={handleStartChatbot}
                       disabled={!inputText.trim() && !isUsingRandomStory}
-                      className="w-full px-6 py-4 rounded-xl font-bold text-lg border-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 bg-green-600 border-green-600 text-white hover:bg-green-700 hover:border-green-700 transition-all duration-200"
+                      className={`w-full px-6 py-4 rounded-xl font-bold text-lg border-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all duration-200 ${
+                        isUsingRandomStory && gameState === GameState.Setup
+                          ? 'bg-green-600 border-green-600 text-white hover:bg-green-700 hover:border-green-700 ring-2 ring-green-300 shadow-lg animate-pulse'
+                          : 'bg-green-600 border-green-600 text-white hover:bg-green-700 hover:border-green-700'
+                      }`}
                     >
                       <Bot className="w-5 h-5" />
-                      Start Chat Adventure
+                      {isUsingRandomStory && gameState === GameState.Setup ? '👇 Start Chat Adventure' : 'Start Chat Adventure'}
                     </button>
                   )}
                 </div>
