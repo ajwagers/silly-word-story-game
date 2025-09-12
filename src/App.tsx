@@ -31,7 +31,7 @@ import Chatbot, { ChatMessage } from "./components/Chatbot";
 import { analyzeStory, generateStoryTemplate, downloadPDF, shareStory, buildCompletedStory } from "./utils/storyUtils";
 import InfoSection from "./components/InfoSection";
 import WordTips from "./components/WordTips";
-import { getRandomStoryFromDb } from "./utils/dbUtils";
+import { getRandomStoryFromDb, StoryPack } from "./utils/dbUtils";
 
 // Generate mosaic tiles data
 const colors = [
@@ -98,6 +98,7 @@ export default function StoryGameApp() {
   const [email, setEmail] = useState("");
   const [isSubscribing, setIsSubscribing] = useState(false);
   const [subscriptionMessage, setSubscriptionMessage] = useState("");
+  const [selectedStoryPacks, setSelectedStoryPacks] = useState<StoryPack[]>(['aesop', 'mother_goose']);
   
   const storyRef = useRef<HTMLDivElement>(null);
   const gameSetupRef = useRef<HTMLDivElement>(null);
@@ -281,7 +282,11 @@ export default function StoryGameApp() {
   const handleLoadRandomStory = async () => {
     setIsLoadingStory(true);
     try {
-      const randomStory = await getRandomStoryFromDb();
+      // Choose a random pack from the selected ones
+      const randomPackIndex = Math.floor(Math.random() * selectedStoryPacks.length);
+      const selectedPack = selectedStoryPacks[randomPackIndex];
+      
+      const randomStory = await getRandomStoryFromDb(selectedPack);
       setHiddenStory(randomStory);
       setIsUsingRandomStory(true);
       setInputText(""); // Clear the visible input
@@ -327,6 +332,7 @@ export default function StoryGameApp() {
     setUserResponse("");
     setCurrentWordIndex(0);
     setMobileMenuOpen(false);
+    setSelectedStoryPacks(['aesop', 'mother_goose']); // Reset to both selected
   };
 
   // Helper functions for smooth scrolling to different sections
@@ -622,14 +628,51 @@ export default function StoryGameApp() {
                   />
                 </div>
                 
+                {/* Story Pack Selection */}
+                <div className="mb-4">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2">Story Types for Random Selection:</h4>
+                  <div className="flex flex-wrap gap-2">
+                    <label className="flex items-center gap-2 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={selectedStoryPacks.includes('aesop')}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedStoryPacks(prev => [...prev, 'aesop']);
+                          } else {
+                            setSelectedStoryPacks(prev => prev.filter(pack => pack !== 'aesop'));
+                          }
+                        }}
+                        className="rounded border-gray-300"
+                      />
+                      <span>Aesop's Fables</span>
+                    </label>
+                    <label className="flex items-center gap-2 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={selectedStoryPacks.includes('mother_goose')}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedStoryPacks(prev => [...prev, 'mother_goose']);
+                          } else {
+                            setSelectedStoryPacks(prev => prev.filter(pack => pack !== 'mother_goose'));
+                          }
+                        }}
+                        className="rounded border-gray-300"
+                      />
+                      <span>Mother Goose Rhymes</span>
+                    </label>
+                  </div>
+                </div>
+                
                 <div className="flex flex-col sm:flex-row gap-3">
                   <button
                     onClick={handleLoadRandomStory}
-                    disabled={isLoadingStory}
+                    disabled={isLoadingStory || selectedStoryPacks.length === 0}
                     className="flex-1 px-4 py-3 rounded-xl font-bold text-base border-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 bg-purple-600 border-purple-600 text-white hover:bg-purple-700 hover:border-purple-700 transition-all duration-200"
                   >
                     <Sparkles className="w-5 h-5" />
-                    {isLoadingStory ? 'Loading...' : 'Load Random Aesop Fable'}
+                    {isLoadingStory ? 'Loading...' : `Load Random Story (${selectedStoryPacks.length > 1 ? 'Mixed' : selectedStoryPacks.includes('aesop') ? 'Aesop' : 'Mother Goose'})`}
                   </button>
                   
                   {inputText.trim() && (

@@ -1,17 +1,21 @@
 import initSqlJs from 'sql.js';
-import dbUrl from '../data/aesop_fables.db?url';
+import aesopDbUrl from '../data/aesop_fables.db?url';
+import motherGooseDbUrl from '../data/mother_goose_rhymes.db?url';
 
 let SQL: any = null;
-let db: any = null;
+const databases: { [key: string]: any } = {};
 
-async function initializeDatabase() {
+export type StoryPack = 'aesop' | 'mother_goose';
+
+async function initializeDatabase(pack: StoryPack) {
   if (!SQL) {
     SQL = await initSqlJs({
       locateFile: (file: string) => `https://sql.js.org/dist/${file}`
     });
   }
   
-  if (!db) {
+  if (!databases[pack]) {
+    const dbUrl = pack === 'aesop' ? aesopDbUrl : motherGooseDbUrl;
     try {
       const response = await fetch(dbUrl);
       if (!response.ok) {
@@ -19,31 +23,38 @@ async function initializeDatabase() {
       }
       const arrayBuffer = await response.arrayBuffer();
       const uint8Array = new Uint8Array(arrayBuffer);
-      db = new SQL.Database(uint8Array);
+      databases[pack] = new SQL.Database(uint8Array);
     } catch (error) {
-      console.error('Error loading database:', error);
-      throw new Error('Could not load the stories database');
+      console.error(`Error loading database for ${pack}:`, error);
+      throw new Error(`Could not load the ${pack === 'aesop' ? "Aesop's Fables" : "Mother Goose's Rhymes"} database`);
     }
   }
   
-  return db;
+  return databases[pack];
 }
 
-export async function getRandomStoryFromDb(): Promise<string> {
+export async function getRandomStoryFromDb(pack: StoryPack): Promise<string> {
   try {
-    const database = await initializeDatabase();
+    const database = await initializeDatabase(pack);
     
     // Try common table and column names for fables/stories
     // Filter stories to 200 words or fewer (approximately 1000 characters)
+    // Lowered min length from 50 to 20 to accommodate shorter rhymes.
     const possibleQueries = [
-      "SELECT text FROM stories WHERE LENGTH(TRIM(text)) > 50 AND LENGTH(text) <= 1000 AND (LENGTH(text) - LENGTH(REPLACE(text, ' ', '')) + 1) <= 200 ORDER BY RANDOM() LIMIT 1",
-      "SELECT content FROM stories WHERE LENGTH(TRIM(content)) > 50 AND LENGTH(content) <= 1000 AND (LENGTH(content) - LENGTH(REPLACE(content, ' ', '')) + 1) <= 200 ORDER BY RANDOM() LIMIT 1", 
-      "SELECT story FROM stories WHERE LENGTH(TRIM(story)) > 50 AND LENGTH(story) <= 1000 AND (LENGTH(story) - LENGTH(REPLACE(story, ' ', '')) + 1) <= 200 ORDER BY RANDOM() LIMIT 1",
-      "SELECT text FROM fables WHERE LENGTH(TRIM(text)) > 50 AND LENGTH(text) <= 1000 AND (LENGTH(text) - LENGTH(REPLACE(text, ' ', '')) + 1) <= 200 ORDER BY RANDOM() LIMIT 1",
-      "SELECT content FROM fables WHERE LENGTH(TRIM(content)) > 50 AND LENGTH(content) <= 1000 AND (LENGTH(content) - LENGTH(REPLACE(content, ' ', '')) + 1) <= 200 ORDER BY RANDOM() LIMIT 1",
-      "SELECT story FROM fables WHERE LENGTH(TRIM(story)) > 50 AND LENGTH(story) <= 1000 AND (LENGTH(story) - LENGTH(REPLACE(story, ' ', '')) + 1) <= 200 ORDER BY RANDOM() LIMIT 1",
-      "SELECT text FROM aesop_fables WHERE LENGTH(TRIM(text)) > 50 AND LENGTH(text) <= 1000 AND (LENGTH(text) - LENGTH(REPLACE(text, ' ', '')) + 1) <= 200 ORDER BY RANDOM() LIMIT 1",
-      "SELECT content FROM aesop_fables WHERE LENGTH(TRIM(content)) > 50 AND LENGTH(content) <= 1000 AND (LENGTH(content) - LENGTH(REPLACE(content, ' ', '')) + 1) <= 200 ORDER BY RANDOM() LIMIT 1"
+      "SELECT text FROM stories WHERE LENGTH(TRIM(text)) > 20 AND LENGTH(text) <= 1000 AND (LENGTH(text) - LENGTH(REPLACE(text, ' ', '')) + 1) <= 200 ORDER BY RANDOM() LIMIT 1",
+      "SELECT content FROM stories WHERE LENGTH(TRIM(content)) > 20 AND LENGTH(content) <= 1000 AND (LENGTH(content) - LENGTH(REPLACE(content, ' ', '')) + 1) <= 200 ORDER BY RANDOM() LIMIT 1", 
+      "SELECT story FROM stories WHERE LENGTH(TRIM(story)) > 20 AND LENGTH(story) <= 1000 AND (LENGTH(story) - LENGTH(REPLACE(story, ' ', '')) + 1) <= 200 ORDER BY RANDOM() LIMIT 1",
+      "SELECT text FROM fables WHERE LENGTH(TRIM(text)) > 20 AND LENGTH(text) <= 1000 AND (LENGTH(text) - LENGTH(REPLACE(text, ' ', '')) + 1) <= 200 ORDER BY RANDOM() LIMIT 1",
+      "SELECT content FROM fables WHERE LENGTH(TRIM(content)) > 20 AND LENGTH(content) <= 1000 AND (LENGTH(content) - LENGTH(REPLACE(content, ' ', '')) + 1) <= 200 ORDER BY RANDOM() LIMIT 1",
+      "SELECT story FROM fables WHERE LENGTH(TRIM(story)) > 20 AND LENGTH(story) <= 1000 AND (LENGTH(story) - LENGTH(REPLACE(story, ' ', '')) + 1) <= 200 ORDER BY RANDOM() LIMIT 1",
+      "SELECT text FROM aesop_fables WHERE LENGTH(TRIM(text)) > 20 AND LENGTH(text) <= 1000 AND (LENGTH(text) - LENGTH(REPLACE(text, ' ', '')) + 1) <= 200 ORDER BY RANDOM() LIMIT 1",
+      "SELECT content FROM aesop_fables WHERE LENGTH(TRIM(content)) > 20 AND LENGTH(content) <= 1000 AND (LENGTH(content) - LENGTH(REPLACE(content, ' ', '')) + 1) <= 200 ORDER BY RANDOM() LIMIT 1",
+      "SELECT text FROM rhymes WHERE LENGTH(TRIM(text)) > 20 AND LENGTH(text) <= 1000 AND (LENGTH(text) - LENGTH(REPLACE(text, ' ', '')) + 1) <= 200 ORDER BY RANDOM() LIMIT 1",
+      "SELECT content FROM rhymes WHERE LENGTH(TRIM(content)) > 20 AND LENGTH(content) <= 1000 AND (LENGTH(content) - LENGTH(REPLACE(content, ' ', '')) + 1) <= 200 ORDER BY RANDOM() LIMIT 1",
+      "SELECT rhyme FROM rhymes WHERE LENGTH(TRIM(rhyme)) > 20 AND LENGTH(rhyme) <= 1000 AND (LENGTH(rhyme) - LENGTH(REPLACE(rhyme, ' ', '')) + 1) <= 200 ORDER BY RANDOM() LIMIT 1",
+      "SELECT text FROM mother_goose WHERE LENGTH(TRIM(text)) > 20 AND LENGTH(text) <= 1000 AND (LENGTH(text) - LENGTH(REPLACE(text, ' ', '')) + 1) <= 200 ORDER BY RANDOM() LIMIT 1",
+      "SELECT content FROM mother_goose WHERE LENGTH(TRIM(content)) > 20 AND LENGTH(content) <= 1000 AND (LENGTH(content) - LENGTH(REPLACE(content, ' ', '')) + 1) <= 200 ORDER BY RANDOM() LIMIT 1",
+      "SELECT rhyme FROM mother_goose WHERE LENGTH(TRIM(rhyme)) > 20 AND LENGTH(rhyme) <= 1000 AND (LENGTH(rhyme) - LENGTH(REPLACE(rhyme, ' ', '')) + 1) <= 200 ORDER BY RANDOM() LIMIT 1"
     ];
     
     let result = null;
@@ -81,21 +92,21 @@ export async function getRandomStoryFromDb(): Promise<string> {
         console.error('Available tables:', tables);
         throw new Error(`Could not find story data. Available tables: ${tables.join(', ')}`);
       } catch (error) {
-        throw new Error('Could not read from the stories database');
+        throw new Error(`Could not read from the ${pack} database`);
       }
     }
     
     return result as string;
     
   } catch (error) {
-    console.error('Error fetching random fable:', error);
+    console.error(`Error fetching random story from ${pack}:`, error);
     throw error;
   }
 }
 
-export async function getTableInfo(): Promise<{ tables: string[], columns: { [table: string]: string[] } }> {
+export async function getTableInfo(pack: StoryPack): Promise<{ tables: string[], columns: { [table: string]: string[] } }> {
   try {
-    const database = await initializeDatabase();
+    const database = await initializeDatabase(pack);
     
     // Get table names
     const tablesStmt = database.prepare("SELECT name FROM sqlite_master WHERE type='table'");
@@ -126,7 +137,7 @@ export async function getTableInfo(): Promise<{ tables: string[], columns: { [ta
     
     return { tables, columns };
   } catch (error) {
-    console.error('Error getting table info:', error);
+    console.error(`Error getting table info for ${pack}:`, error);
     throw error;
   }
 }
