@@ -99,6 +99,9 @@ export default function StoryGameApp() {
   const [isSubscribing, setIsSubscribing] = useState(false);
   const [subscriptionMessage, setSubscriptionMessage] = useState("");
   const [selectedStoryPacks, setSelectedStoryPacks] = useState<StoryPack[]>(['aesop', 'mother_goose']);
+  const [isBrowsingStories, setIsBrowsingStories] = useState(false);
+  const [browsedStory, setBrowsedStory] = useState('');
+  const [isLoadingBrowseStory, setIsLoadingBrowseStory] = useState(false);
   
   const storyRef = useRef<HTMLDivElement>(null);
   const gameSetupRef = useRef<HTMLDivElement>(null);
@@ -278,6 +281,33 @@ export default function StoryGameApp() {
     setUserResponse("");
   };
 
+  // Browse stories for reading only
+  const handleBrowseStory = async () => {
+    setIsLoadingBrowseStory(true);
+    try {
+      // Choose a random pack from the selected ones
+      const randomPackIndex = Math.floor(Math.random() * selectedStoryPacks.length);
+      const selectedPack = selectedStoryPacks[randomPackIndex];
+      
+      const randomStory = await getRandomStoryFromDb(selectedPack);
+      setBrowsedStory(randomStory);
+      setIsBrowsingStories(true);
+      
+      // Scroll to show the story
+      setTimeout(() => {
+        storyRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }, 100);
+    } catch (error) {
+      console.error('Error loading story for browsing:', error);
+      alert('Sorry, could not load a story. Please try again.');
+    } finally {
+      setIsLoadingBrowseStory(false);
+    }
+  };
+
   // Fetches a random story from the database utils
   const handleLoadRandomStory = async () => {
     setIsLoadingStory(true);
@@ -333,6 +363,8 @@ export default function StoryGameApp() {
     setCurrentWordIndex(0);
     setMobileMenuOpen(false);
     setSelectedStoryPacks(['aesop', 'mother_goose']); // Reset to both selected
+    setIsBrowsingStories(false);
+    setBrowsedStory('');
   };
 
   // Helper functions for smooth scrolling to different sections
@@ -675,6 +707,15 @@ export default function StoryGameApp() {
                     {isLoadingStory ? 'Loading...' : `Load Random Story (${selectedStoryPacks.length > 1 ? 'Mixed' : selectedStoryPacks.includes('aesop') ? 'Aesop' : 'Mother Goose'})`}
                   </button>
                   
+                  <button
+                    onClick={handleBrowseStory}
+                    disabled={isLoadingBrowseStory || selectedStoryPacks.length === 0}
+                    className="px-4 py-3 rounded-xl font-bold text-base border-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 bg-teal-600 border-teal-600 text-white hover:bg-teal-700 hover:border-teal-700 transition-all duration-200"
+                  >
+                    <BookOpen className="w-5 h-5" />
+                    {isLoadingBrowseStory ? 'Loading...' : 'Just Read'}
+                  </button>
+                  
                   {inputText.trim() && (
                     <button
                       onClick={() => {
@@ -779,6 +820,43 @@ export default function StoryGameApp() {
                 onReset={handleReset}
               />
             )}
+          </section>
+        )}
+
+        {/* Story Browsing Section */}
+        {isBrowsingStories && browsedStory && (
+          <section ref={storyRef} className="max-w-6xl mx-auto px-4 py-8">
+            <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg p-8 border">
+              <div className="flex justify-between items-start mb-6">
+                <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                  <BookOpen className="w-6 h-6" />
+                  Story for Reading
+                </h2>
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleBrowseStory}
+                    disabled={isLoadingBrowseStory || selectedStoryPacks.length === 0}
+                    className="px-4 py-2 rounded-lg font-medium text-sm border-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 bg-teal-600 border-teal-600 text-white hover:bg-teal-700 hover:border-teal-700 transition-all duration-200"
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                    {isLoadingBrowseStory ? 'Loading...' : 'Next Story'}
+                  </button>
+                  <button
+                    onClick={() => setIsBrowsingStories(false)}
+                    className="px-4 py-2 rounded-lg font-medium text-sm border-2 bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200 hover:border-gray-400 transition-all duration-200"
+                  >
+                    <X className="w-4 h-4" />
+                    Close
+                  </button>
+                </div>
+              </div>
+              
+              <div className="prose max-w-none">
+                <div className="text-lg leading-relaxed text-gray-800 whitespace-pre-wrap">
+                  {browsedStory}
+                </div>
+              </div>
+            </div>
           </section>
         )}
 
