@@ -14,6 +14,7 @@ async function initializeDatabase(pack: StoryPack) {
     });
   }
   
+  
   if (!databases[pack]) {
     const dbUrl = pack === 'aesop' ? aesopDbUrl : motherGooseDbUrl;
     try {
