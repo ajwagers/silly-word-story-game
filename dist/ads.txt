@@ -1,0 +1,10 @@
+# ads.txt file for Google AdSense
+# Replace YOUR_PUBLISHER_ID with your actual Google AdSense publisher ID
+# Your publisher ID should look like: pub-1234567890123456
+# You can find this in your Google AdSense account dashboard 
+
+google.com, pub-1807492004820117, DIRECT, f08c47fec0942fa0
+
+# Additional ad networks can be added below if needed
+# Format: domain.com, publisher_id, relationship_type, certification_authority_id
+# Example: partnerad.com, pub-9876543210987654, RESELLER, f08c47fec0942fa0
